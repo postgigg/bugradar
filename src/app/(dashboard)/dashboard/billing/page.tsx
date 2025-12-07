@@ -2,8 +2,9 @@ import { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { CreditCard, Check, Zap, Crown, Building2 } from 'lucide-react'
+import { CreditCard, Check, Zap, Crown, Building2, Server, Lock } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import Link from 'next/link'
 
 export const metadata: Metadata = {
   title: 'Billing | BugRadar',
@@ -170,6 +171,54 @@ export default async function BillingPage() {
           })}
         </div>
       </div>
+
+      {/* Self-Hosted Option */}
+      <Card className="p-6 border-2 border-dashed border-slate-300 dark:border-slate-600">
+        <div className="flex items-start gap-4">
+          <div className="w-12 h-12 bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl flex items-center justify-center flex-shrink-0">
+            <Server className="w-6 h-6 text-white" />
+          </div>
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-1">
+              <h3 className="font-semibold text-slate-900 dark:text-white">Self-Hosted Data</h3>
+              <span className="px-2 py-0.5 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 text-xs font-medium rounded-full">
+                One-time
+              </span>
+            </div>
+            <p className="text-slate-600 dark:text-slate-400 text-sm mb-4">
+              Own your data. Connect your own Supabase, Anthropic, and Resend accounts.
+              Bugs go directly to your infrastructure — we never see your data.
+            </p>
+
+            <div className="flex flex-wrap gap-3 mb-4">
+              <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
+                <Lock className="w-3.5 h-3.5" />
+                Your Supabase
+              </div>
+              <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
+                <Lock className="w-3.5 h-3.5" />
+                Your Anthropic API
+              </div>
+              <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
+                <Lock className="w-3.5 h-3.5" />
+                Your Resend
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between">
+              <div>
+                <span className="text-3xl font-bold text-slate-900 dark:text-white">$99</span>
+                <span className="text-slate-500 dark:text-slate-400 ml-1">one-time</span>
+              </div>
+              <Link href="/dashboard/settings/self-hosted">
+                <Button>
+                  Unlock Self-Hosted
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </Card>
 
       {/* Usage */}
       <Card className="p-6">

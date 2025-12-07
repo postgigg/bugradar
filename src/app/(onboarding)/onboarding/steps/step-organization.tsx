@@ -19,7 +19,7 @@ const roles = [
 
 export function StepOrganization() {
   const router = useRouter()
-  const { nextStep, setOrganization, data } = useOnboardingStore()
+  const { nextStep, setOrganization, setOrganizationId, data } = useOnboardingStore()
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -100,6 +100,7 @@ export function StepOrganization() {
 
       // Store in local state and proceed
       setOrganization({ name, slug, role })
+      setOrganizationId(orgId)
       nextStep()
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong')
