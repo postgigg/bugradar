@@ -2,7 +2,7 @@ import { Metadata } from 'next'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { CheckCircle, X, HelpCircle } from 'lucide-react'
+import { CheckCircle, X, HelpCircle, Server, Lock } from 'lucide-react'
 
 export const metadata: Metadata = {
   title: 'Pricing | BugRadar',
@@ -176,6 +176,54 @@ export default function PricingPage() {
             </Card>
           ))}
         </div>
+
+        {/* Self-Hosted Option */}
+        <Card className="p-8 border-2 border-dashed border-slate-300 dark:border-slate-600 max-w-3xl mx-auto mb-16">
+          <div className="flex flex-col md:flex-row items-start gap-6">
+            <div className="w-16 h-16 bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl flex items-center justify-center flex-shrink-0">
+              <Server className="w-8 h-8 text-white" />
+            </div>
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-2">
+                <h3 className="text-xl font-semibold text-slate-900 dark:text-white">Self-Hosted Data</h3>
+                <span className="px-2 py-0.5 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 text-xs font-medium rounded-full">
+                  One-time
+                </span>
+              </div>
+              <p className="text-slate-600 dark:text-slate-400 mb-4">
+                Own your data completely. Connect your own Supabase, Anthropic, and Resend accounts.
+                Bugs go directly to your infrastructure — we never see your data. Unlimited everything.
+              </p>
+
+              <div className="flex flex-wrap gap-4 mb-6">
+                <div className="flex items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400">
+                  <Lock className="w-4 h-4" />
+                  Your Supabase
+                </div>
+                <div className="flex items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400">
+                  <Lock className="w-4 h-4" />
+                  Your Anthropic API
+                </div>
+                <div className="flex items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400">
+                  <Lock className="w-4 h-4" />
+                  Your Resend
+                </div>
+              </div>
+
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                <div>
+                  <span className="text-4xl font-bold text-slate-900 dark:text-white">$199</span>
+                  <span className="text-slate-500 dark:text-slate-400 ml-1">one-time activation</span>
+                </div>
+                <Link href="/signup">
+                  <Button>
+                    Get Started
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </Card>
 
         {/* Feature Comparison Table */}
         <div className="mt-24">
