@@ -23,7 +23,7 @@ export default async function ProjectsPage() {
   const { data: projects } = await supabase
     .from('projects')
     .select(`
-      id, name, slug, platform, framework, created_at, is_active,
+      id, name, slug, platform, framework, local_path, created_at, is_active,
       bugs(count),
       api_keys(count)
     `)

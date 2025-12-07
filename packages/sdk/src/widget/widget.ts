@@ -1128,6 +1128,8 @@ export class BugReporterWidget {
       text: el.textContent?.trim().slice(0, 50) || '',
       html: el.outerHTML.slice(0, 300),
       boundingBox: rect,
+      annotationType: 'highlight',
+      annotationColor: this.currentColor,
     });
 
     const overlay = document.createElement('div');
