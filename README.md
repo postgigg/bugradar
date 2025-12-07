@@ -1,36 +1,289 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# BugRadar 🐛
 
-## Getting Started
+**Bug tracking that doesn't suck.** AI-powered bug capture for modern development teams.
 
-First, run the development server:
+[![npm version](https://img.shields.io/npm/v/bugradar.svg)](https://www.npmjs.com/package/bugradar)
+[![License: MIT](https://img.shields.io/badge/License-MIT-coral.svg)](https://opensource.org/licenses/MIT)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+---
+
+## The Problem
+
+Traditional bug tracking is broken:
+- Users can't describe bugs properly
+- Screenshots miss critical context
+- Console errors get lost
+- Developers play detective instead of fixing
+
+## The Solution
+
+BugRadar captures **everything** automatically. Two lines of code. Full context. AI-enhanced reports.
+
+```javascript
+import { BugRadar } from 'bugradar'
+
+BugRadar.init({ apiKey: 'your-api-key' })
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+That's it. Your users get a beautiful bug reporter. You get actionable reports.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## ✨ Features
 
-## Learn More
+### For Users
+- **Visual Bug Capture** — Native screen capture with area selection
+- **Annotation Tools** — Draw, highlight, add arrows and text
+- **One-Click Reporting** — No forms, no friction
 
-To learn more about Next.js, take a look at the following resources:
+### For Developers
+- **Full Context** — Console logs, network requests, browser info
+- **AI Enhancement** — Claude automatically improves bug descriptions
+- **Claude Code Integration** — One-click AI bug fixes directly in your codebase
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### For Teams
+- **Real-time Dashboard** — Track, prioritize, and resolve bugs
+- **Email Notifications** — Get notified when bugs are reported
+- **Project Management** — Organize by project, assign to team members
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## 🚀 Quick Start
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### 1. Install the SDK
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+npm install bugradar
+```
+
+### 2. Initialize in Your App
+
+```javascript
+import { BugRadar } from 'bugradar'
+
+BugRadar.init({
+  apiKey: 'br_live_xxxxxxxxxx',
+  // Optional configuration
+  position: 'bottom-right',
+  theme: 'auto',
+  showButton: true,
+})
+```
+
+### 3. Start Catching Bugs
+
+A floating bug button appears in your app. Users click it to report issues with full context captured automatically.
+
+---
+
+## 🎯 How It Works
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                         YOUR APP                                │
+│                                                                 │
+│    ┌──────────────┐                                            │
+│    │  🐛 Report   │  ← User clicks                             │
+│    └──────────────┘                                            │
+│           │                                                     │
+│           ▼                                                     │
+│    ┌──────────────────────────────────────────┐                │
+│    │  BugRadar Widget                         │                │
+│    │  • Select bug type                       │                │
+│    │  • Capture screenshot                    │                │
+│    │  • Add annotations                       │                │
+│    │  • AI enhances description               │                │
+│    └──────────────────────────────────────────┘                │
+│           │                                                     │
+└───────────│─────────────────────────────────────────────────────┘
+            │
+            ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  BugRadar Dashboard                                             │
+│  • View all bugs with full context                              │
+│  • Assign to team members                                       │
+│  • Launch Claude Code for AI fixes                              │
+│  • Track resolution status                                      │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 🛠 SDK Configuration
+
+```javascript
+BugRadar.init({
+  // Required
+  apiKey: 'br_live_xxxxxxxxxx',
+
+  // Widget Position
+  position: 'bottom-right', // 'bottom-left' | 'top-right' | 'top-left'
+
+  // Appearance
+  theme: 'auto',           // 'light' | 'dark' | 'auto'
+  showButton: true,        // Show floating button
+
+  // User Context (optional)
+  user: {
+    id: 'user_123',
+    email: 'user@example.com',
+    name: 'Jane Doe',
+  },
+
+  // Custom Metadata
+  metadata: {
+    version: '1.2.3',
+    environment: 'production',
+  },
+})
+```
+
+---
+
+## 🤖 Claude Code Integration
+
+BugRadar integrates with [Claude Code](https://claude.ai/claude-code) for AI-powered bug fixes:
+
+1. **View Bug** — Open a bug in the dashboard
+2. **Launch Claude** — Click "Fix with Claude Code"
+3. **AI Analyzes** — Claude reviews the bug context
+4. **Get Fixed** — Receive code changes with full explanation
+
+```
+Bug: "Login button unresponsive on Safari"
+     ↓
+Claude Code analyzes context, console errors, and page state
+     ↓
+Generates fix: "Added webkit-specific touch event handler"
+     ↓
+Summary pushed back to BugRadar dashboard
+```
+
+---
+
+## 📊 Dashboard Features
+
+| Feature | Description |
+|---------|-------------|
+| **Bug List** | Filter by status, priority, project |
+| **Bug Detail** | Full context, screenshots, console logs |
+| **AI Summary** | Claude-enhanced descriptions |
+| **Team Management** | Invite members, assign bugs |
+| **API Keys** | Manage per-project keys |
+| **Email Alerts** | Get notified on new bugs |
+
+---
+
+## 🏗 Tech Stack
+
+- **Frontend**: Next.js 14, React 19, TailwindCSS
+- **Backend**: Supabase (Auth, Database, Storage)
+- **AI**: Anthropic Claude (Enhancement, Fixes)
+- **Email**: Resend
+- **SDK**: TypeScript, html2canvas
+
+---
+
+## 📦 Project Structure
+
+```
+bugradar/
+├── packages/
+│   └── sdk/                 # npm package (bugradar)
+│       ├── src/
+│       │   ├── widget/      # Bug reporter UI
+│       │   └── utils/       # Capture utilities
+│       └── dist/            # Built package
+├── src/
+│   ├── app/                 # Next.js app router
+│   │   ├── (auth)/          # Login, signup, etc.
+│   │   ├── (dashboard)/     # Main dashboard
+│   │   ├── (marketing)/     # Landing, docs, pricing
+│   │   └── api/             # API routes
+│   ├── components/          # React components
+│   └── lib/                 # Utilities, Supabase, email
+└── supabase/
+    └── migrations/          # Database schema
+```
+
+---
+
+## 🔧 Self-Hosting
+
+### Prerequisites
+- Node.js 18+
+- Supabase project
+- Anthropic API key (for AI features)
+- Resend API key (for email)
+
+### Setup
+
+1. **Clone the repo**
+```bash
+git clone https://github.com/postgigg/bugradar.git
+cd bugradar
+```
+
+2. **Install dependencies**
+```bash
+npm install
+```
+
+3. **Configure environment**
+```bash
+cp .env.example .env.local
+# Edit .env.local with your keys
+```
+
+4. **Run migrations**
+```bash
+npx supabase db push
+```
+
+5. **Start development**
+```bash
+npm run dev
+```
+
+---
+
+## 🗺 Roadmap
+
+- [x] Visual bug capture with annotations
+- [x] AI-enhanced descriptions
+- [x] Claude Code integration
+- [x] Email notifications
+- [x] Team management
+- [ ] Slack integration
+- [ ] GitHub issue sync
+- [ ] Browser extension
+- [ ] Mobile SDK (React Native)
+- [ ] Self-hosted Docker image
+
+---
+
+## 💼 For Startups
+
+BugRadar is built for fast-moving teams:
+
+- **5-minute setup** — Start catching bugs today
+- **Zero maintenance** — We handle infrastructure
+- **Scales with you** — From MVP to enterprise
+
+---
+
+## 📄 License
+
+MIT © [BugRadar](https://bugradar.io)
+
+---
+
+<p align="center">
+  <strong>Stop playing bug detective. Start shipping.</strong>
+</p>
+
+<p align="center">
+  <a href="https://bugradar.io">Website</a> •
+  <a href="https://www.npmjs.com/package/bugradar">NPM</a> •
+  <a href="https://twitter.com/bugradar">Twitter</a>
+</p>
