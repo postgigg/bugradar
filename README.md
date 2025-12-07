@@ -1,11 +1,11 @@
 # BugRadar 🐛
 
-**Bug tracking that doesn't suck.** Self-hosted, AI-powered bug capture for modern development teams.
+**Bug tracking that doesn't suck.** AI-powered bug capture for modern development teams.
 
 [![npm version](https://img.shields.io/npm/v/bugradar.svg)](https://www.npmjs.com/package/bugradar)
 [![License: MIT](https://img.shields.io/badge/License-MIT-coral.svg)](https://opensource.org/licenses/MIT)
 
-> **Self-Hosted** — Run BugRadar on your own infrastructure. Your data stays yours.
+> **Works Everywhere** — Capture bugs from localhost, staging, or production. One SDK, all environments.
 
 ---
 
@@ -16,21 +16,19 @@ Traditional bug tracking is broken:
 - Screenshots miss critical context
 - Console errors get lost
 - Developers play detective instead of fixing
+- **Local bugs are impossible to reproduce**
 
 ## The Solution
 
-BugRadar captures **everything** automatically. Self-hosted platform + lightweight SDK. Full context. AI-enhanced reports.
+BugRadar captures **everything** automatically — even from localhost. Two lines of code. Full context. AI-enhanced reports.
 
 ```javascript
 import { BugRadar } from 'bugradar'
 
-BugRadar.init({
-  apiKey: 'your-api-key',
-  endpoint: 'http://localhost:3000/api/v1'  // Your self-hosted instance
-})
+BugRadar.init({ apiKey: 'br_live_xxxxxxxxxx' })
 ```
 
-That's it. Your users get a beautiful bug reporter. You get actionable reports. **On your own servers.**
+That's it. Whether your app runs on `localhost:3000` or `production.com`, bugs get captured with full context and sent to your BugRadar dashboard.
 
 ---
 
@@ -267,13 +265,13 @@ npm run dev
 
 ---
 
-## 💼 Why Self-Hosted?
+## 💼 Why BugRadar?
 
-- **Data Ownership** — Your bug reports stay on your servers
-- **No Vendor Lock-in** — MIT licensed, fork it, modify it, own it
-- **Full Control** — Customize everything to your workflow
-- **Privacy First** — Screenshots and logs never leave your infrastructure
-- **Cost Effective** — No per-seat pricing, run it forever
+- **Localhost Support** — Capture bugs from local development, not just production
+- **Full Context** — Screenshots, console logs, network requests, browser info
+- **AI-Powered** — Claude enhances descriptions and can fix bugs automatically
+- **Developer-First** — Built by devs, for devs. No bloat, no BS
+- **Open Source** — MIT licensed, see exactly how it works
 
 ---
 
@@ -288,6 +286,7 @@ MIT © [BugRadar](https://bugradar.io)
 </p>
 
 <p align="center">
+  <a href="https://bugradar.io">Website</a> •
   <a href="https://www.npmjs.com/package/bugradar">NPM</a> •
   <a href="https://github.com/postgigg/bugradar">GitHub</a>
 </p>
