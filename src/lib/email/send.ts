@@ -1,4 +1,4 @@
-import { resend, emailConfig } from './resend'
+import { getResend, emailConfig } from './resend'
 import { bugCreatedEmail } from './templates/bug-created'
 
 interface SendBugCreatedEmailParams {
@@ -23,6 +23,7 @@ export async function sendBugCreatedEmail(params: SendBugCreatedEmailParams) {
   })
 
   try {
+    const resend = getResend()
     const { data, error } = await resend.emails.send({
       from: emailConfig.from,
       to: Array.isArray(params.to) ? params.to : [params.to],
@@ -59,6 +60,7 @@ interface SendEmailParams {
 
 export async function sendEmail({ to, subject, html, tags }: SendEmailParams) {
   try {
+    const resend = getResend()
     const { data, error } = await resend.emails.send({
       from: emailConfig.from,
       to: Array.isArray(to) ? to : [to],
