@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { createClient, SupabaseClient } from '@supabase/supabase-js'
 
 // Webhook endpoint for Claude Code to report bug fix progress
 // Claude will call this endpoint when:
@@ -8,10 +8,20 @@ import { createClient } from '@supabase/supabase-js'
 // 3. Fix completed
 // 4. Fix failed
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+// Lazy initialization to prevent build errors
+let _supabase: SupabaseClient | null = null
+
+function getSupabase(): SupabaseClient {
+  if (!_supabase) {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+    const key = process.env.SUPABASE_SERVICE_ROLE_KEY
+    if (!url || !key) {
+      throw new Error('Supabase credentials not configured')
+    }
+    _supabase = createClient(url, key)
+  }
+  return _supabase
+}
 
 interface ClaudeWebhookPayload {
   bugId: string
@@ -31,6 +41,7 @@ interface ClaudeWebhookPayload {
 
 export async function POST(request: NextRequest) {
   try {
+    const supabase = getSupabase()
     const payload: ClaudeWebhookPayload = await request.json()
 
     // Validate required fields

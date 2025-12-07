@@ -1,15 +1,30 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import Anthropic from '@anthropic-ai/sdk';
 import { sendBugCreatedEmail } from '@/lib/email';
 
-// Create admin client for API routes
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+// Lazy initialization to prevent build errors
+let _supabase: SupabaseClient | null = null;
+let _anthropic: Anthropic | null = null;
 
-const anthropic = new Anthropic();
+function getSupabase(): SupabaseClient {
+  if (!_supabase) {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!url || !key) {
+      throw new Error('Supabase credentials not configured');
+    }
+    _supabase = createClient(url, key);
+  }
+  return _supabase;
+}
+
+function getAnthropic(): Anthropic {
+  if (!_anthropic) {
+    _anthropic = new Anthropic();
+  }
+  return _anthropic;
+}
 
 interface BugReportPayload {
   title: string;
@@ -64,6 +79,9 @@ interface BugReportPayload {
 
 export async function POST(request: NextRequest) {
   try {
+    const supabase = getSupabase();
+    const anthropic = getAnthropic();
+
     // Get API key from header
     const apiKey = request.headers.get('X-API-Key');
 
@@ -343,6 +361,8 @@ async function uploadScreenshot(
   base64Data: string,
   projectId: string
 ): Promise<{ url: string; path: string }> {
+  const supabase = getSupabase();
+
   // Extract base64 content
   const matches = base64Data.match(/^data:image\/(\w+);base64,(.+)$/);
   if (!matches) {
@@ -382,6 +402,8 @@ async function uploadScreenshot(
 // GET handler - fetch bugs for a page (used by bug overlay)
 export async function GET(request: NextRequest) {
   try {
+    const supabase = getSupabase();
+
     // Get API key from header or query
     const apiKey = request.headers.get('X-API-Key') ||
                    request.headers.get('Authorization')?.replace('Bearer ', '');
