@@ -190,7 +190,7 @@ export function StepPlan() {
             </div>
 
             <div className="mb-4">
-              <span className="text-3xl font-bold text-slate-900 dark:text-white">$199</span>
+              <span className="text-3xl font-bold text-slate-900 dark:text-white">$499</span>
               <span className="text-slate-500"> one-time</span>
             </div>
 

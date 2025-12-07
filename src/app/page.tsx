@@ -730,7 +730,7 @@ export default function LandingPage() {
 
                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                   <div>
-                    <span className="text-4xl font-bold text-slate-900 dark:text-white">$199</span>
+                    <span className="text-4xl font-bold text-slate-900 dark:text-white">$499</span>
                     <span className="text-slate-500 dark:text-slate-400 ml-1">one-time activation</span>
                   </div>
                   <Link href="/signup">

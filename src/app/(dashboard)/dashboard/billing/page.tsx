@@ -207,7 +207,7 @@ export default async function BillingPage() {
 
             <div className="flex items-center justify-between">
               <div>
-                <span className="text-3xl font-bold text-slate-900 dark:text-white">$199</span>
+                <span className="text-3xl font-bold text-slate-900 dark:text-white">$499</span>
                 <span className="text-slate-500 dark:text-slate-400 ml-1">one-time</span>
               </div>
               <Link href="/dashboard/settings/self-hosted">
