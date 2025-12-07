@@ -277,7 +277,7 @@ npm run dev
 
 ## 📄 License
 
-MIT © [BugRadar](https://bugradar.io)
+MIT © [BugRadar](https://bugradar.com)
 
 ---
 
@@ -286,7 +286,7 @@ MIT © [BugRadar](https://bugradar.io)
 </p>
 
 <p align="center">
-  <a href="https://bugradar.io">Website</a> •
+  <a href="https://bugradar.com">Website</a> •
   <a href="https://www.npmjs.com/package/bugradar">NPM</a> •
   <a href="https://github.com/postgigg/bugradar">GitHub</a>
 </p>
