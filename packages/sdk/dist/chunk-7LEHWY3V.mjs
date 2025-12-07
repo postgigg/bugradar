@@ -2248,7 +2248,9 @@ var BugReporterWidget = class {
       tagName: el.tagName.toLowerCase(),
       text: el.textContent?.trim().slice(0, 50) || "",
       html: el.outerHTML.slice(0, 300),
-      boundingBox: rect
+      boundingBox: rect,
+      annotationType: "highlight",
+      annotationColor: this.currentColor
     });
     const overlay = document.createElement("div");
     overlay.className = "br-element-selected";

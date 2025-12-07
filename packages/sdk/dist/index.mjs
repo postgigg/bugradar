@@ -1,13 +1,13 @@
 import {
   BugRadar
-} from "./chunk-UD7KR44M.mjs";
+} from "./chunk-7LEHWY3V.mjs";
 
 // src/index.ts
 if (typeof window !== "undefined") {
   const script = document.currentScript;
   const apiKey = script?.getAttribute("data-api-key");
   if (apiKey) {
-    import("./client-YWPCFD2X.mjs").then(({ BugRadar: BugRadar2 }) => {
+    import("./client-VB6MHDUO.mjs").then(({ BugRadar: BugRadar2 }) => {
       BugRadar2.init(apiKey);
     });
   }
