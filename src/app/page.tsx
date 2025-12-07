@@ -655,7 +655,7 @@ export default function LandingPage() {
               },
               {
                 name: 'Team',
-                price: '$49',
+                price: '$99',
                 period: '/month',
                 desc: 'For larger organizations',
                 features: ['Unlimited reports', '200 AI credits', 'Unlimited projects', '25 team members', 'API access', 'Custom branding', 'Priority support'],
@@ -730,7 +730,7 @@ export default function LandingPage() {
 
                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                   <div>
-                    <span className="text-4xl font-bold text-slate-900 dark:text-white">$499</span>
+                    <span className="text-4xl font-bold text-slate-900 dark:text-white">$99</span>
                     <span className="text-slate-500 dark:text-slate-400 ml-1">one-time activation</span>
                   </div>
                   <Link href="/signup">

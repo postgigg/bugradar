@@ -257,7 +257,7 @@ export default function SelfHostedPage() {
             </div>
 
             <div className="flex items-center justify-center gap-2 mb-6">
-              <span className="text-4xl font-bold text-slate-900 dark:text-white">$499</span>
+              <span className="text-4xl font-bold text-slate-900 dark:text-white">$99</span>
               <span className="text-slate-500">one-time payment</span>
             </div>
 

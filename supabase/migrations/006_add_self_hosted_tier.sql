@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS public.self_hosted_purchases (
   user_id UUID NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
   stripe_payment_id TEXT,
   stripe_checkout_session_id TEXT,
-  amount_cents INTEGER NOT NULL DEFAULT 49900, -- $499 in cents
+  amount_cents INTEGER NOT NULL DEFAULT 9900, -- $99 in cents
   currency TEXT NOT NULL DEFAULT 'usd',
   status TEXT NOT NULL DEFAULT 'pending', -- pending, completed, failed, refunded
   purchased_at TIMESTAMPTZ,

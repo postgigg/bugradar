@@ -55,7 +55,7 @@ const plans = [
   },
   {
     name: 'Team',
-    price: '$49',
+    price: '$99',
     period: '/month',
     description: 'For teams that need collaboration and scale.',
     features: {
@@ -212,7 +212,7 @@ export default function PricingPage() {
 
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                 <div>
-                  <span className="text-4xl font-bold text-slate-900 dark:text-white">$499</span>
+                  <span className="text-4xl font-bold text-slate-900 dark:text-white">$99</span>
                   <span className="text-slate-500 dark:text-slate-400 ml-1">one-time activation</span>
                 </div>
                 <Link href="/signup">

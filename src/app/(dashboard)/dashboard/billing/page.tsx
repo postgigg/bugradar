@@ -33,7 +33,7 @@ const plans = [
   },
   {
     name: 'Team',
-    price: '$49',
+    price: '$99',
     period: '/month',
     description: 'For larger organizations',
     features: ['Unlimited actions', '200 AI credits', 'Unlimited projects', '25 team members', 'API access', 'Custom branding', 'Priority support'],
@@ -207,7 +207,7 @@ export default async function BillingPage() {
 
             <div className="flex items-center justify-between">
               <div>
-                <span className="text-3xl font-bold text-slate-900 dark:text-white">$499</span>
+                <span className="text-3xl font-bold text-slate-900 dark:text-white">$99</span>
                 <span className="text-slate-500 dark:text-slate-400 ml-1">one-time</span>
               </div>
               <Link href="/dashboard/settings/self-hosted">
