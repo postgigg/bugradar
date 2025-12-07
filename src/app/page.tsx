@@ -633,7 +633,7 @@ export default function LandingPage() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+          <div className="grid md:grid-cols-2 gap-8 max-w-3xl mx-auto">
             {[
               {
                 name: 'Free',
@@ -645,22 +645,13 @@ export default function LandingPage() {
                 popular: false
               },
               {
-                name: 'Pro',
-                price: '$19',
-                period: '/month',
-                desc: 'For growing teams',
-                features: ['500 reports/month', '50 AI credits', '10 projects', '10 team members', 'API access', 'Priority support'],
-                cta: 'Start Free Trial',
-                popular: true
-              },
-              {
                 name: 'Team',
                 price: '$99',
                 period: '/month',
                 desc: 'For larger organizations',
                 features: ['Unlimited reports', '200 AI credits', 'Unlimited projects', '25 team members', 'API access', 'Custom branding', 'Priority support'],
                 cta: 'Start Free Trial',
-                popular: false
+                popular: true
               },
             ].map((plan, i) => (
               <Card key={i} className={`p-8 relative transition-all duration-300 hover:shadow-xl ${plan.popular ? 'border-2 border-coral-500 shadow-xl scale-105 bg-white dark:bg-slate-800' : 'border-slate-200 dark:border-slate-700 hover:-translate-y-1'}`}>

@@ -32,32 +32,11 @@ const plans = [
     ctaVariant: 'outline' as const,
   },
   {
-    name: 'Pro',
-    price: '$19',
-    period: '/month',
-    description: 'For professional developers and growing projects.',
-    popular: true,
-    features: {
-      bugs: '500/month',
-      aiCredits: '50',
-      projects: '10',
-      teamMembers: '10',
-      support: 'Priority',
-      screenshot: true,
-      aiEnhance: true,
-      kanban: true,
-      apiAccess: true,
-      prioritySupport: true,
-      customBranding: false,
-    },
-    cta: 'Start Free Trial',
-    ctaVariant: 'default' as const,
-  },
-  {
     name: 'Team',
     price: '$99',
     period: '/month',
     description: 'For teams that need collaboration and scale.',
+    popular: true,
     features: {
       bugs: 'Unlimited',
       aiCredits: '200',
@@ -72,7 +51,7 @@ const plans = [
       customBranding: true,
     },
     cta: 'Start Free Trial',
-    ctaVariant: 'outline' as const,
+    ctaVariant: 'default' as const,
   },
 ]
 
@@ -105,7 +84,7 @@ export default function PricingPage() {
         </div>
 
         {/* Pricing Cards */}
-        <div className="grid md:grid-cols-3 gap-8 mb-16">
+        <div className="grid md:grid-cols-2 gap-8 max-w-3xl mx-auto mb-16">
           {plans.map((plan) => (
             <Card
               key={plan.name}

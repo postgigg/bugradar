@@ -2,7 +2,7 @@ import { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { CreditCard, Check, Zap, Crown, Building2, Server, Lock } from 'lucide-react'
+import { CreditCard, Check, Zap, Building2, Server, Lock } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import Link from 'next/link'
 
@@ -22,22 +22,13 @@ const plans = [
     icon: Zap,
   },
   {
-    name: 'Pro',
-    price: '$19',
-    period: '/month',
-    description: 'For growing teams',
-    features: ['500 actions/month', '50 AI credits', '10 projects', '10 team members', 'API access', 'Priority support'],
-    tier: 'pro',
-    popular: true,
-    icon: Crown,
-  },
-  {
     name: 'Team',
     price: '$99',
     period: '/month',
     description: 'For larger organizations',
     features: ['Unlimited actions', '200 AI credits', 'Unlimited projects', '25 team members', 'API access', 'Custom branding', 'Priority support'],
     tier: 'team',
+    popular: true,
     icon: Building2,
   },
 ]
@@ -105,7 +96,7 @@ export default async function BillingPage() {
       {/* Plans */}
       <div>
         <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">Available Plans</h2>
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-2 gap-6 max-w-2xl">
           {plans.map((plan) => {
             const isCurrentPlan = plan.tier === currentTier
             const Icon = plan.icon
@@ -129,13 +120,11 @@ export default async function BillingPage() {
                   <div className={cn(
                     'w-10 h-10 rounded-lg flex items-center justify-center',
                     plan.tier === 'free' && 'bg-slate-100 dark:bg-slate-800',
-                    plan.tier === 'pro' && 'bg-coral-100 dark:bg-coral-900/30',
                     plan.tier === 'team' && 'bg-coral-100 dark:bg-coral-900/30'
                   )}>
                     <Icon className={cn(
                       'w-5 h-5',
                       plan.tier === 'free' && 'text-slate-600 dark:text-slate-400',
-                      plan.tier === 'pro' && 'text-coral-600 dark:text-coral-400',
                       plan.tier === 'team' && 'text-coral-600 dark:text-coral-400'
                     )} />
                   </div>
