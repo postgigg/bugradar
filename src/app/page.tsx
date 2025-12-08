@@ -444,7 +444,7 @@ export default function LandingPage() {
               Dead Simple Integration
             </div>
             <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white">
-              Two lines. That&apos;s it.
+              Three lines. That&apos;s it.
             </h2>
             <p className="mt-4 text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
               Add the SDK to your localhost app and start capturing feedback immediately.
@@ -475,7 +475,7 @@ export default function LandingPage() {
                       <span className="text-amber-300">BugRadar</span>
                       <span className="text-white">{' }'} </span>
                       <span className="text-coral-400">from</span>
-                      <span className="text-green-400"> &apos;@bugradar/sdk&apos;</span>
+                      <span className="text-green-400"> &apos;bugradar&apos;</span>
                       <span className="text-white">;</span>
                     </div>
                   </div>
@@ -491,10 +491,19 @@ export default function LandingPage() {
                       <span className="text-white">);</span>
                     </div>
                   </div>
-                  {/* Line 3 - Comment */}
+                  {/* Line 3 - Server helper */}
                   <div className="flex items-center gap-4">
                     <span className="text-slate-600 select-none w-6 text-right">3</span>
-                    <span className="text-slate-500">// Done! Widget appears. Users can report, suggest, or request changes.</span>
+                    <div>
+                      <span className="text-coral-400">export</span>
+                      <span className="text-white"> {'{ '}</span>
+                      <span className="text-amber-300">POST</span>
+                      <span className="text-white">{' }'} </span>
+                      <span className="text-coral-400">from</span>
+                      <span className="text-green-400"> &apos;bugradar/server&apos;</span>
+                      <span className="text-white">;</span>
+                      <span className="text-slate-500 ml-4">// api route for terminal launch</span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -538,7 +547,7 @@ export default function LandingPage() {
               { icon: Terminal, title: 'Claude Code Integration', desc: 'One-click launches Claude Code with full context. AI analyzes and implements fixes automatically.', gradient: 'from-coral-500 to-red-600' },
               { icon: Bug, title: 'Auto Error Capture', desc: 'JavaScript errors automatically become reports. Stack traces, console logs, network data included.', gradient: 'from-green-500 to-emerald-600' },
               { icon: Target, title: 'Element Selectors', desc: 'CSS selectors and XPath captured for every selected element. Claude knows exactly what to fix.', gradient: 'from-blue-500 to-cyan-600' },
-              { icon: Zap, title: '2-Line Setup', desc: 'npm install, two lines of code, done. Works with any JavaScript framework on localhost.', gradient: 'from-amber-500 to-orange-600' },
+              { icon: Zap, title: '3-Line Setup', desc: 'npm install, three lines of code, done. Works with any JavaScript framework on localhost.', gradient: 'from-amber-500 to-orange-600' },
             ].map((feature, i) => (
               <Card key={i} className="group p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-slate-200 dark:border-slate-700 overflow-hidden relative">
                 {/* Gradient Background on Hover */}

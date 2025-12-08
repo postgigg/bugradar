@@ -23,7 +23,7 @@ export default function DocsPage() {
           Introduction
         </h1>
         <p className="text-xl text-slate-600 dark:text-slate-400">
-          AI-powered bug tracking SDK. Capture bugs visually with 2 lines of code.
+          AI-powered bug tracking SDK. Capture bugs visually with 3 lines of code.
         </p>
       </div>
 
@@ -51,6 +51,17 @@ BugRadar.init('br_live_your_api_key');
 // That's it! AI-powered bug tracking is now active.`}
           language="typescript"
           filename="src/index.tsx"
+        />
+
+        <p className="text-slate-600 dark:text-slate-400 my-4">
+          To enable auto-launch of Claude Code from bug overlays, add this API route:
+        </p>
+
+        <CodeBlock
+          code={`// Next.js: app/api/bugradar/launch-claude/route.ts
+export { POST } from 'bugradar/server';`}
+          language="typescript"
+          filename="app/api/bugradar/launch-claude/route.ts"
         />
 
         <div className="flex items-start gap-3 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl">
