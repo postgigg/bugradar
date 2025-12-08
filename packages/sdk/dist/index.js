@@ -3184,6 +3184,7 @@ var init_bug_overlay = __esm({
             },
             body: JSON.stringify({ status: "in_progress" })
           });
+          const prompt2 = this.buildFixPrompt(bug);
           const response = await fetch(`${this.config.apiUrl.replace("/api/v1", "")}/api/terminal/launch`, {
             method: "POST",
             headers: {
@@ -3191,7 +3192,10 @@ var init_bug_overlay = __esm({
             },
             body: JSON.stringify({
               bugId: bug.id,
-              projectPath: bug.projectPath || ""
+              projectPath: bug.projectPath || "",
+              organizationId: "",
+              webhookUrl: "https://bugradar.io/api/webhooks/claude-code",
+              prompt: prompt2
             })
           });
           if (response.ok) {

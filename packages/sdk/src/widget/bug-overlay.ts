@@ -608,7 +608,10 @@ export class BugOverlay {
         body: JSON.stringify({ status: 'in_progress' }),
       });
 
-      // Then launch terminal
+      // Build the prompt (same as dashboard)
+      const prompt = this.buildFixPrompt(bug);
+
+      // Then launch terminal with full payload
       const response = await fetch(`${this.config.apiUrl.replace('/api/v1', '')}/api/terminal/launch`, {
         method: 'POST',
         headers: {
@@ -617,6 +620,9 @@ export class BugOverlay {
         body: JSON.stringify({
           bugId: bug.id,
           projectPath: bug.projectPath || '',
+          organizationId: '',
+          webhookUrl: 'https://bugradar.io/api/webhooks/claude-code',
+          prompt: prompt,
         }),
       });
 
