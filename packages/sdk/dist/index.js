@@ -2015,6 +2015,35 @@ var init_widget = __esm({
         document.addEventListener("mousemove", this.handleMouseMove.bind(this));
         document.addEventListener("mouseup", this.handleMouseUp.bind(this));
         document.addEventListener("keydown", this.handleKeydown.bind(this));
+        document.addEventListener("touchstart", this.handleTouchStart.bind(this), { passive: false });
+        document.addEventListener("touchmove", this.handleTouchMove.bind(this), { passive: false });
+        document.addEventListener("touchend", this.handleTouchEnd.bind(this), { passive: false });
+      }
+      handleTouchStart(e) {
+        if (!this.isSelectingElements) return;
+        const touch = e.touches[0];
+        const target = document.elementFromPoint(touch.clientX, touch.clientY);
+        if (target && !target.closest("#bugradar-widget") && !target.closest(".br-selector-tooltip")) {
+          e.preventDefault();
+          this.showHighlight(target);
+        }
+      }
+      handleTouchMove(e) {
+        if (!this.isSelectingElements) return;
+        const touch = e.touches[0];
+        const target = document.elementFromPoint(touch.clientX, touch.clientY);
+        if (target && !target.closest("#bugradar-widget") && !target.closest(".br-selector-tooltip")) {
+          this.showHighlight(target);
+        }
+      }
+      handleTouchEnd(e) {
+        if (!this.isSelectingElements) return;
+        const touch = e.changedTouches[0];
+        const target = document.elementFromPoint(touch.clientX, touch.clientY);
+        if (target && !target.closest("#bugradar-widget") && !target.closest(".br-selector-tooltip")) {
+          e.preventDefault();
+          this.addSelectedElement(target);
+        }
       }
       handleClick(e) {
         const target = e.target;
@@ -2279,13 +2308,42 @@ var init_widget = __esm({
         this.render();
         this.isSelectingElements = true;
         document.body.classList.add("br-selecting-mode");
+        const isTouchDevice = "ontouchstart" in window || navigator.maxTouchPoints > 0;
         this.selectorTooltip = document.createElement("div");
         this.selectorTooltip.className = "br-selector-tooltip";
         this.selectorTooltip.innerHTML = `
-      <span>\u{1F3AF} Click to select (${this.selectedElements.length}/10)</span>
-      <span><kbd>Enter</kbd> done \xB7 <kbd>Esc</kbd> cancel</span>
+      <span>\u{1F3AF} Tap to select (${this.selectedElements.length}/10)</span>
+      <div style="display:flex;gap:8px;align-items:center;margin-top:8px;">
+        <button data-action="finish-selection" style="background:#ef4444;color:white;border:none;padding:8px 16px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;touch-action:manipulation;">
+          \u2713 Done
+        </button>
+        <button data-action="cancel-selection" style="background:rgba(255,255,255,0.1);color:white;border:none;padding:8px 16px;border-radius:8px;font-size:14px;cursor:pointer;touch-action:manipulation;">
+          Cancel
+        </button>
+      </div>
+      ${!isTouchDevice ? '<span style="margin-top:8px;opacity:0.6;font-size:12px;"><kbd>Enter</kbd> done \xB7 <kbd>Esc</kbd> cancel</span>' : ""}
     `;
         document.body.appendChild(this.selectorTooltip);
+        this.selectorTooltip.querySelector('[data-action="finish-selection"]')?.addEventListener("click", (e) => {
+          e.stopPropagation();
+          this.finishElementSelection();
+        });
+        this.selectorTooltip.querySelector('[data-action="cancel-selection"]')?.addEventListener("click", (e) => {
+          e.stopPropagation();
+          this.cancelElementSelection();
+        });
+      }
+      cancelElementSelection() {
+        this.isSelectingElements = false;
+        document.body.classList.remove("br-selecting-mode");
+        this.selectorTooltip?.remove();
+        this.selectorTooltip = null;
+        if (this.highlightEl) this.highlightEl.style.display = "none";
+        this.selectedElements = [];
+        this.selectedOverlays.forEach((o) => o.remove());
+        this.selectedOverlays = [];
+        this.step = "capture";
+        this.render();
       }
       finishElementSelection() {
         this.isSelectingElements = false;
@@ -2327,10 +2385,27 @@ var init_widget = __esm({
         document.body.appendChild(overlay);
         this.selectedOverlays.push(overlay);
         if (this.selectorTooltip) {
+          const isTouchDevice = "ontouchstart" in window || navigator.maxTouchPoints > 0;
           this.selectorTooltip.innerHTML = `
-        <span>\u{1F3AF} Click to select (${this.selectedElements.length}/10)</span>
-        <span><kbd>Enter</kbd> done \xB7 <kbd>Esc</kbd> cancel</span>
+        <span>\u{1F3AF} Tap to select (${this.selectedElements.length}/10)</span>
+        <div style="display:flex;gap:8px;align-items:center;margin-top:8px;">
+          <button data-action="finish-selection" style="background:#ef4444;color:white;border:none;padding:8px 16px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;touch-action:manipulation;">
+            \u2713 Done
+          </button>
+          <button data-action="cancel-selection" style="background:rgba(255,255,255,0.1);color:white;border:none;padding:8px 16px;border-radius:8px;font-size:14px;cursor:pointer;touch-action:manipulation;">
+            Cancel
+          </button>
+        </div>
+        ${!isTouchDevice ? '<span style="margin-top:8px;opacity:0.6;font-size:12px;"><kbd>Enter</kbd> done \xB7 <kbd>Esc</kbd> cancel</span>' : ""}
       `;
+          this.selectorTooltip.querySelector('[data-action="finish-selection"]')?.addEventListener("click", (e) => {
+            e.stopPropagation();
+            this.finishElementSelection();
+          });
+          this.selectorTooltip.querySelector('[data-action="cancel-selection"]')?.addEventListener("click", (e) => {
+            e.stopPropagation();
+            this.cancelElementSelection();
+          });
         }
       }
       async takeScreenshot() {

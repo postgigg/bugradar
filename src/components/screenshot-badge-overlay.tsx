@@ -4,7 +4,8 @@ import { useState, useRef, useEffect, useCallback } from 'react'
 import Image from 'next/image'
 import {
   Bug, AlertTriangle, Lightbulb, Edit3, X, Move,
-  Maximize2, ChevronRight, CheckCircle, Clock, Loader2
+  Maximize2, ChevronRight, CheckCircle, Clock, Loader2,
+  Terminal, Sparkles
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -36,7 +37,9 @@ interface ScreenshotBadgeOverlayProps {
   bugPriority: string
   bugTitle: string
   elements: BugElement[]
+  projectPath?: string
   onStatusChange?: (newStatus: string) => void
+  onClaudeFix?: () => void
   className?: string
 }
 
@@ -63,7 +66,9 @@ export function ScreenshotBadgeOverlay({
   bugPriority,
   bugTitle,
   elements,
+  projectPath,
   onStatusChange,
+  onClaudeFix,
   className,
 }: ScreenshotBadgeOverlayProps) {
   const [isFullscreen, setIsFullscreen] = useState(false)
@@ -73,6 +78,7 @@ export function ScreenshotBadgeOverlay({
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
   const [status, setStatus] = useState(bugStatus)
   const [isUpdating, setIsUpdating] = useState(false)
+  const [isLaunchingClaude, setIsLaunchingClaude] = useState(false)
   const [imageLoaded, setImageLoaded] = useState(false)
   const [imageDimensions, setImageDimensions] = useState({ width: 0, height: 0 })
 
@@ -187,6 +193,42 @@ export function ScreenshotBadgeOverlay({
       onStatusChange?.(newStatus)
     }
     setIsUpdating(false)
+  }
+
+  // Launch Claude Code to fix the bug
+  const handleClaudeFix = async () => {
+    if (!projectPath) {
+      // If no project path, call the callback if provided
+      onClaudeFix?.()
+      return
+    }
+
+    setIsLaunchingClaude(true)
+    try {
+      // First update status to in_progress
+      await supabase
+        .from('bugs')
+        .update({ status: 'in_progress', claude_fixing: true })
+        .eq('id', bugId)
+
+      setStatus('in_progress')
+      onStatusChange?.('in_progress')
+
+      // Launch the terminal with Claude
+      const response = await fetch('/api/terminal/launch', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ projectPath, bugId }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to launch Claude')
+      }
+    } catch (error) {
+      console.error('Failed to launch Claude:', error)
+    } finally {
+      setIsLaunchingClaude(false)
+    }
   }
 
   // Calculate badge position relative to displayed image
@@ -420,6 +462,28 @@ export function ScreenshotBadgeOverlay({
                           Mark Resolved
                         </span>
                         <ChevronRight className="w-3 h-3" />
+                      </>
+                    )}
+                  </Button>
+                )}
+
+                {/* Claude Fix Button */}
+                {status !== 'resolved' && status !== 'closed' && (projectPath || onClaudeFix) && (
+                  <Button
+                    size="sm"
+                    className="w-full justify-between text-xs h-8 bg-gradient-to-r from-coral-500 to-coral-600 hover:from-coral-600 hover:to-coral-700"
+                    onClick={handleClaudeFix}
+                    disabled={isLaunchingClaude}
+                  >
+                    {isLaunchingClaude ? (
+                      <Loader2 className="w-3 h-3 animate-spin" />
+                    ) : (
+                      <>
+                        <span className="flex items-center gap-1.5">
+                          <Sparkles className="w-3 h-3" />
+                          Claude Fix It
+                        </span>
+                        <Terminal className="w-3 h-3" />
                       </>
                     )}
                   </Button>

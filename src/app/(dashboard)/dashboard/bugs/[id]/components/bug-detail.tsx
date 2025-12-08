@@ -311,6 +311,7 @@ export function BugDetail({ bug, teamMembers, subscription, organizationId }: Bu
                   bugPriority={priority}
                   bugTitle={bug.title}
                   elements={bug.bug_elements || []}
+                  projectPath={bug.projects?.local_path}
                   onStatusChange={(newStatus) => {
                     setStatus(newStatus)
                     router.refresh()
