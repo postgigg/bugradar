@@ -1,21 +1,26 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
 export default function AuthCallbackPage() {
   const router = useRouter()
-  const searchParams = useSearchParams()
   const [status, setStatus] = useState('Processing authentication...')
 
   useEffect(() => {
     const handleAuth = async () => {
-      const supabase = createClient()
+      // Get params directly from window.location to avoid Suspense issues
+      const url = new URL(window.location.href)
+      const code = url.searchParams.get('code')
+      const error = url.searchParams.get('error')
+      const errorDescription = url.searchParams.get('error_description')
 
-      // Get error from URL params (if any)
-      const error = searchParams.get('error')
-      const errorDescription = searchParams.get('error_description')
+      console.log('[Auth Callback] URL:', window.location.href)
+      console.log('[Auth Callback] Code:', code ? code.substring(0, 20) + '...' : 'none')
+      console.log('[Auth Callback] Error:', error)
+
+      const supabase = createClient()
 
       if (error) {
         console.error('[Auth Callback] OAuth error:', error, errorDescription)
@@ -24,43 +29,39 @@ export default function AuthCallbackPage() {
         return
       }
 
-      // Get code from URL params (PKCE flow)
-      const code = searchParams.get('code')
-
-      console.log('[Auth Callback] Code present:', !!code)
-      console.log('[Auth Callback] Hash present:', !!window.location.hash)
-
       if (code) {
-        // Exchange the code for a session (PKCE flow)
-        const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code)
+        console.log('[Auth Callback] Exchanging code for session...')
+        const { data, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code)
 
         if (exchangeError) {
-          console.error('[Auth Callback] Exchange error:', exchangeError)
+          console.error('[Auth Callback] Exchange error:', exchangeError.message)
           setStatus('Authentication failed')
           router.push(`/login?error=exchange_failed&message=${encodeURIComponent(exchangeError.message)}`)
           return
         }
+
+        console.log('[Auth Callback] Exchange successful, session:', !!data.session)
+
+        if (data.session) {
+          // Check if user needs onboarding
+          const { data: profile } = await supabase
+            .from('users')
+            .select('onboarding_completed')
+            .eq('id', data.session.user.id)
+            .single()
+
+          const redirectTo = profile?.onboarding_completed ? '/dashboard' : '/onboarding'
+          setStatus('Success! Redirecting...')
+          router.push(redirectTo)
+          return
+        }
       }
 
-      // Check for hash tokens (implicit flow) or existing session
-      // Give Supabase a moment to process
-      await new Promise(resolve => setTimeout(resolve, 100))
-
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession()
-
-      console.log('[Auth Callback] Session:', !!session, 'Error:', sessionError?.message)
-
-      if (sessionError) {
-        console.error('[Auth Callback] Session error:', sessionError)
-        setStatus('Authentication failed')
-        router.push('/login?error=session_error')
-        return
-      }
+      // No code - check for existing session
+      const { data: { session } } = await supabase.auth.getSession()
 
       if (session) {
-        console.log('[Auth Callback] Success! User:', session.user.id)
-
-        // Check if user needs onboarding
+        console.log('[Auth Callback] Found existing session')
         const { data: profile } = await supabase
           .from('users')
           .select('onboarding_completed')
@@ -68,7 +69,6 @@ export default function AuthCallbackPage() {
           .single()
 
         const redirectTo = profile?.onboarding_completed ? '/dashboard' : '/onboarding'
-        setStatus('Success! Redirecting...')
         router.push(redirectTo)
       } else {
         console.log('[Auth Callback] No session found')
@@ -78,7 +78,7 @@ export default function AuthCallbackPage() {
     }
 
     handleAuth()
-  }, [router, searchParams])
+  }, [router])
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-50">
