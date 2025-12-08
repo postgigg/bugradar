@@ -303,23 +303,19 @@ export function BugDetail({ bug, teamMembers, subscription, organizationId }: Bu
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                {bug.bug_elements && bug.bug_elements.length > 0 ? (
-                  <ScreenshotBadgeOverlay
-                    src={bug.screenshot_url}
-                    alt="Bug screenshot"
-                    bugId={bug.id}
-                    bugStatus={status}
-                    bugPriority={priority}
-                    bugTitle={bug.title}
-                    elements={bug.bug_elements}
-                    onStatusChange={(newStatus) => {
-                      setStatus(newStatus)
-                      router.refresh()
-                    }}
-                  />
-                ) : (
-                  <ScreenshotViewer src={bug.screenshot_url} alt="Bug screenshot" />
-                )}
+                <ScreenshotBadgeOverlay
+                  src={bug.screenshot_url}
+                  alt="Bug screenshot"
+                  bugId={bug.id}
+                  bugStatus={status}
+                  bugPriority={priority}
+                  bugTitle={bug.title}
+                  elements={bug.bug_elements || []}
+                  onStatusChange={(newStatus) => {
+                    setStatus(newStatus)
+                    router.refresh()
+                  }}
+                />
               </CardContent>
             </Card>
           )}

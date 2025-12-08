@@ -68,10 +68,8 @@ tell application "System Events"
         set frontmost to true
         delay 0.3
 
-        -- Send Shift+Tab TWICE to switch to Accept mode
+        -- Send Shift+Tab ONCE to switch to Accept mode
         -- key code 48 is Tab on macOS
-        key code 48 using {shift down}
-        delay 0.5
         key code 48 using {shift down}
         delay 0.8
 
