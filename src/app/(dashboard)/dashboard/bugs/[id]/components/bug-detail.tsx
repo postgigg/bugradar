@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/label'
 import { AITerminal } from '@/components/ai-terminal'
 import { ClaudeTerminalLauncher } from '@/components/claude-terminal-launcher'
 import { ScreenshotViewer } from '@/components/screenshot-viewer'
+import { ScreenshotBadgeOverlay } from '@/components/screenshot-badge-overlay'
 import { createClient } from '@/lib/supabase/client'
 import {
   ArrowLeft, ExternalLink, Clock, Monitor,
@@ -288,14 +289,37 @@ export function BugDetail({ bug, teamMembers, subscription, organizationId }: Bu
             </Card>
           )}
 
-          {/* Screenshot */}
+          {/* Screenshot with Badge Overlay */}
           {bug.screenshot_url && (
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Screenshot</CardTitle>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  Screenshot
+                  {bug.bug_elements && bug.bug_elements.length > 0 && (
+                    <span className="text-xs bg-coral-100 dark:bg-coral-900/30 text-coral-600 dark:text-coral-400 px-2 py-0.5 rounded-full">
+                      {bug.bug_elements.length} element{bug.bug_elements.length !== 1 ? 's' : ''} marked
+                    </span>
+                  )}
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <ScreenshotViewer src={bug.screenshot_url} alt="Bug screenshot" />
+                {bug.bug_elements && bug.bug_elements.length > 0 ? (
+                  <ScreenshotBadgeOverlay
+                    src={bug.screenshot_url}
+                    alt="Bug screenshot"
+                    bugId={bug.id}
+                    bugStatus={status}
+                    bugPriority={priority}
+                    bugTitle={bug.title}
+                    elements={bug.bug_elements}
+                    onStatusChange={(newStatus) => {
+                      setStatus(newStatus)
+                      router.refresh()
+                    }}
+                  />
+                ) : (
+                  <ScreenshotViewer src={bug.screenshot_url} alt="Bug screenshot" />
+                )}
               </CardContent>
             </Card>
           )}
