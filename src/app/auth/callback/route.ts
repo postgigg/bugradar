@@ -1,14 +1,13 @@
-import { createClient } from '@/lib/supabase/server'
+import { createServerClient } from '@supabase/ssr'
+import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 
 // Always use production domain for redirects
 const getBaseUrl = (requestUrl: string) => {
   const url = new URL(requestUrl)
-  // In production, always redirect to bugradar.io regardless of internal Netlify URL
   if (url.hostname.includes('netlify.app') || url.hostname === 'bugradar.io') {
     return 'https://bugradar.io'
   }
-  // Local development
   return url.origin
 }
 
@@ -18,19 +17,42 @@ export async function GET(request: Request) {
   const next = searchParams.get('next') ?? '/dashboard'
 
   const baseUrl = getBaseUrl(request.url)
+  const cookieStore = await cookies()
 
+  // Log all available cookies
+  const allCookies = cookieStore.getAll()
   console.log('[Auth Callback] Request URL:', request.url)
   console.log('[Auth Callback] Base URL:', baseUrl)
   console.log('[Auth Callback] Code:', code ? 'present' : 'missing')
+  console.log('[Auth Callback] Available cookies:', allCookies.map(c => c.name).join(', ') || 'none')
 
   if (code) {
-    const supabase = await createClient()
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return cookieStore.getAll()
+          },
+          setAll(cookiesToSet) {
+            try {
+              cookiesToSet.forEach(({ name, value, options }) =>
+                cookieStore.set(name, value, options)
+              )
+            } catch {
+              // Ignore
+            }
+          },
+        },
+      }
+    )
+
     const { error } = await supabase.auth.exchangeCodeForSession(code)
 
     console.log('[Auth Callback] Exchange error:', error?.message || 'none')
 
     if (!error) {
-      // Check if user needs onboarding
       const { data: { user } } = await supabase.auth.getUser()
 
       if (user) {
@@ -44,10 +66,12 @@ export async function GET(request: Request) {
         console.log('[Auth Callback] Success, redirecting to:', `${baseUrl}${redirectTo}`)
         return NextResponse.redirect(`${baseUrl}${redirectTo}`)
       }
+    } else {
+      console.log('[Auth Callback] Exchange failed:', error.message)
+      return NextResponse.redirect(`${baseUrl}/login?error=exchange_failed&message=${encodeURIComponent(error.message)}`)
     }
   }
 
-  // Return to login with error
-  console.log('[Auth Callback] Failed, redirecting to login')
+  console.log('[Auth Callback] No code, redirecting to login')
   return NextResponse.redirect(`${baseUrl}/login?error=auth_callback_error`)
 }
