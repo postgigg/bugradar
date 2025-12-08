@@ -466,10 +466,20 @@ export async function GET(request: NextRequest) {
     if (pageUrl) {
       // Strip protocol and trailing slash for more flexible matching
       const cleanUrl = pageUrl.replace(/^https?:\/\//, '').replace(/\/$/, '');
+      console.log('[Bug API GET] Filtering by page_url with ilike:', `%${cleanUrl}%`);
       query = query.ilike('page_url', `%${cleanUrl}%`);
     }
 
+    console.log('[Bug API GET] Fetching bugs for project_id:', apiKeyData.project_id);
+
     const { data: bugs, error: bugsError } = await query;
+
+    console.log('[Bug API GET] Found bugs:', bugs?.length || 0);
+    if (bugs && bugs.length > 0) {
+      bugs.forEach(bug => {
+        console.log('[Bug API GET] Bug:', bug.id, '| page_url:', bug.page_url, '| has_elements:', (bug.bug_elements as any[])?.length || 0);
+      });
+    }
 
     if (bugsError) {
       console.error('Bugs fetch error:', bugsError);
