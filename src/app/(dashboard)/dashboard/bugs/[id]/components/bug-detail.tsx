@@ -73,6 +73,7 @@ export function BugDetail({ bug, teamMembers, subscription, organizationId }: Bu
   const [showAITerminal, setShowAITerminal] = useState(false)
   const [showClaudeLauncher, setShowClaudeLauncher] = useState(false)
   const [aiCreditsUsed, setAiCreditsUsed] = useState(subscription?.ai_credits_used || 0)
+  const [isLaunchingClaude, setIsLaunchingClaude] = useState(false)
 
   // Check if user has Claude Code access (Pro or Team plan)
   const hasClaudeCodeAccess = subscription?.plan_tier === 'pro' || subscription?.plan_tier === 'team' || subscription?.plan_tier === 'enterprise'
@@ -136,6 +137,43 @@ export function BugDetail({ bug, teamMembers, subscription, organizationId }: Bu
     await navigator.clipboard.writeText(bug.id)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
+  }
+
+  // Direct Claude Fix - launches terminal immediately
+  const handleDirectClaudeFix = async () => {
+    if (!bug.projects?.local_path) {
+      // If no project path, open the launcher modal instead
+      setShowClaudeLauncher(true)
+      return
+    }
+
+    setIsLaunchingClaude(true)
+    try {
+      // Update status to in_progress
+      await supabase
+        .from('bugs')
+        .update({ status: 'in_progress', claude_fixing: true })
+        .eq('id', bug.id)
+
+      setStatus('in_progress')
+
+      // Launch the terminal with Claude
+      const response = await fetch('/api/terminal/launch', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ projectPath: bug.projects.local_path, bugId: bug.id }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to launch Claude')
+      }
+
+      router.refresh()
+    } catch (error) {
+      console.error('Failed to launch Claude:', error)
+    } finally {
+      setIsLaunchingClaude(false)
+    }
   }
 
   // Build console errors from bug data
@@ -544,30 +582,30 @@ export function BugDetail({ bug, teamMembers, subscription, organizationId }: Bu
                 </div>
               )}
 
-              {/* Claude Code - Pro/Team Only */}
+              {/* Claude Fix It - Direct Launch */}
               <Button
-                onClick={() => setShowClaudeLauncher(true)}
+                onClick={handleDirectClaudeFix}
                 className={cn("w-full bg-gradient-to-r text-white h-11", reportTypeStyle.buttonBg)}
-                disabled={isClaudeFixing}
+                disabled={isClaudeFixing || isLaunchingClaude}
               >
                 {isClaudeFixing ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                     Claude is fixing...
                   </>
-                ) : bug.projects?.local_path ? (
+                ) : isLaunchingClaude ? (
                   <>
-                    <Terminal className="w-4 h-4 mr-2" />
-                    Launch Claude Code
-                    <Sparkles className="w-3 h-3 ml-auto" />
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Launching...
                   </>
                 ) : (
                   <>
-                    <Terminal className="w-4 h-4 mr-2" />
-                    Open Terminal
+                    <Sparkles className="w-4 h-4 mr-2" />
+                    Claude Fix It
+                    <Terminal className="w-3 h-3 ml-auto" />
                   </>
                 )}
-                {!hasClaudeCodeAccess && !isClaudeFixing && (
+                {!hasClaudeCodeAccess && !isClaudeFixing && !isLaunchingClaude && (
                   <span className="ml-auto text-[10px] bg-white/20 px-1.5 py-0.5 rounded">PRO</span>
                 )}
               </Button>
