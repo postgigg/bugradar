@@ -1,6 +1,6 @@
 {
   "name": "bugradar",
-  "version": "0.1.13",
+  "version": "0.1.14",
   "description": "AI-powered bug tracking SDK - capture bugs visually with 2 lines of code",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
