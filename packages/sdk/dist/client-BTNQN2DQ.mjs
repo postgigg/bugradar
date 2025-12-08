@@ -1,6 +1,6 @@
 import {
   BugRadar
-} from "./chunk-SLR24SSI.mjs";
+} from "./chunk-GIKRSFLR.mjs";
 export {
   BugRadar
 };

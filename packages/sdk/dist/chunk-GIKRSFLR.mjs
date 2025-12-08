@@ -2913,6 +2913,8 @@ var BugOverlay = class {
   renderOverlays() {
     this.overlays.forEach((overlay) => overlay.remove());
     this.overlays.clear();
+    this.elementHighlights.forEach((highlight) => highlight.remove());
+    this.elementHighlights.clear();
     console.log("[BugRadar] Rendering overlays for", this.bugs.length, "bugs");
     const currentPageUrl = window.location.origin + window.location.pathname;
     const currentPageWithHash = window.location.href.split("?")[0];
@@ -2961,6 +2963,7 @@ var BugOverlay = class {
   }
   createBugBadge(bug, element) {
     const rect = element.getBoundingClientRect();
+    this.showElementHighlight(bug.id, element);
     const badge = document.createElement("div");
     badge.className = "br-bug-badge";
     badge.innerHTML = ICONS.bug;
@@ -2978,10 +2981,19 @@ var BugOverlay = class {
       if (bug.selector) {
         const element = document.querySelector(bug.selector);
         const badge = this.overlays.get(bug.id);
-        if (element && badge) {
+        const highlight = this.elementHighlights.get(bug.id);
+        if (element) {
           const rect = element.getBoundingClientRect();
-          badge.style.left = `${rect.right + window.scrollX - 14}px`;
-          badge.style.top = `${rect.top + window.scrollY - 14}px`;
+          if (badge) {
+            badge.style.left = `${rect.right + window.scrollX - 14}px`;
+            badge.style.top = `${rect.top + window.scrollY - 14}px`;
+          }
+          if (highlight) {
+            highlight.style.left = `${rect.left + window.scrollX - 4}px`;
+            highlight.style.top = `${rect.top + window.scrollY - 4}px`;
+            highlight.style.width = `${rect.width + 8}px`;
+            highlight.style.height = `${rect.height + 8}px`;
+          }
         }
       }
     });
@@ -2989,12 +3001,6 @@ var BugOverlay = class {
   showBugPopup(bug, badge) {
     this.closePopup();
     this.activeBugId = bug.id;
-    if (bug.selector) {
-      const element = document.querySelector(bug.selector);
-      if (element) {
-        this.showElementHighlight(bug.id, element);
-      }
-    }
     const popup = document.createElement("div");
     popup.className = "br-bug-popup";
     const badgeRect = badge.getBoundingClientRect();
@@ -3060,10 +3066,7 @@ var BugOverlay = class {
       this.activePopup.remove();
       this.activePopup = null;
     }
-    if (this.activeBugId) {
-      this.hideElementHighlight(this.activeBugId);
-      this.activeBugId = null;
-    }
+    this.activeBugId = null;
   }
   showElementHighlight(bugId, element) {
     this.hideElementHighlight(bugId);
