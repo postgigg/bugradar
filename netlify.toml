@@ -9,20 +9,14 @@
 [[plugins]]
   package = "@netlify/plugin-nextjs"
 
-# Redirect netlify subdomain to primary domain for consistent auth
+# Force primary domain - redirect ALL netlify subdomains
 [[redirects]]
-  from = "https://gorgeous-taiyaki-57e388.netlify.app/*"
+  from = "https://*.netlify.app/*"
   to = "https://bugradar.io/:splat"
   status = 301
   force = true
 
-[[redirects]]
-  from = "https://main--gorgeous-taiyaki-57e388.netlify.app/*"
-  to = "https://bugradar.io/:splat"
-  status = 301
-  force = true
-
-# Headers for security
+# Headers for security and cookie handling
 [[headers]]
   for = "/*"
   [headers.values]
@@ -33,5 +27,11 @@
 # API routes should not be cached
 [[headers]]
   for = "/api/*"
+  [headers.values]
+    Cache-Control = "no-store, no-cache, must-revalidate"
+
+# Auth callback needs special handling
+[[headers]]
+  for = "/auth/callback"
   [headers.values]
     Cache-Control = "no-store, no-cache, must-revalidate"
