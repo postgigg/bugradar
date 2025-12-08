@@ -610,9 +610,8 @@ export class BugOverlay {
       // Build the prompt
       const prompt = this.buildFixPrompt(bug);
 
-      // Call LOCAL BugRadar server to launch terminal
-      // This runs on localhost:3000 where the dashboard is running
-      const response = await fetch('http://localhost:3000/api/terminal/launch', {
+      // Call BugRadar production server to launch terminal
+      const response = await fetch('https://bugradar.io/api/terminal/launch', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

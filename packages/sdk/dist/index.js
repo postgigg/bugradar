@@ -3185,7 +3185,7 @@ var init_bug_overlay = __esm({
             body: JSON.stringify({ status: "in_progress" })
           });
           const prompt2 = this.buildFixPrompt(bug);
-          const response = await fetch("http://localhost:3000/api/terminal/launch", {
+          const response = await fetch("https://bugradar.io/api/terminal/launch", {
             method: "POST",
             headers: {
               "Content-Type": "application/json"
