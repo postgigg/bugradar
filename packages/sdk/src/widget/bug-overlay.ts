@@ -515,7 +515,7 @@ export class BugOverlay {
               <rect x="3" y="3" width="18" height="18" rx="2"/>
               <path d="M8 12l2 2 4-4"/>
             </svg>
-            Quick Fix
+            Open Terminal
           </button>
           <button class="br-popup-btn br-popup-btn-secondary" data-action="view-details">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -539,7 +539,9 @@ export class BugOverlay {
 
     popup.querySelector('[data-action="view-details"]')?.addEventListener('click', () => {
       // Open bug details in dashboard
-      window.open(`${this.config.apiUrl.replace('/api', '')}/dashboard/bugs/${bug.id}`, '_blank');
+      // Open bug details on BugRadar dashboard
+      const dashboardUrl = this.config.apiUrl.replace('/api/v1', '').replace('/api', '');
+      window.open(`${dashboardUrl}/dashboard/bugs/${bug.id}`, '_blank');
     });
 
     document.body.appendChild(popup);
@@ -610,38 +612,108 @@ export class BugOverlay {
       // Build the prompt
       const prompt = this.buildFixPrompt(bug);
 
-      // Call BugRadar production server to launch terminal
-      const response = await fetch('https://bugradar.io/api/terminal/launch', {
+      // Call the local server to launch terminal
+      // This requires adding the BugRadar server helper to your project:
+      // import { POST } from 'bugradar/server' in app/api/bugradar/launch-claude/route.ts
+      const response = await fetch(`${window.location.origin}/api/bugradar/launch-claude`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           bugId: bug.id,
+          bugTitle: bug.title,
+          description: bug.description,
+          pageUrl: bug.pageUrl || window.location.href,
+          consoleErrors: bug.consoleErrors,
           projectPath: bug.projectPath || '',
-          organizationId: '',
-          webhookUrl: 'https://bugradar.io/api/webhooks/claude-code',
-          prompt: prompt,
-        }),
+          prompt: prompt
+        })
       });
 
       if (response.ok) {
         if (btn) {
           btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> Launched!`;
         }
-        setTimeout(() => {
-          this.closePopup();
-        }, 1000);
+
+        // Show success toast
+        const toast = document.createElement('div');
+        toast.style.cssText = `
+          position: fixed;
+          top: 20px;
+          right: 20px;
+          background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+          color: white;
+          padding: 16px 24px;
+          border-radius: 12px;
+          font-size: 14px;
+          z-index: 10003;
+          box-shadow: 0 10px 40px rgba(16, 185, 129, 0.4);
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          animation: br-slide-in 0.3s ease-out;
+        `;
+        toast.innerHTML = `
+          <style>@keyframes br-slide-in { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }</style>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+          <span>Terminal launched with Claude!</span>
+        `;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 4000);
+        setTimeout(() => this.closePopup(), 1500);
       } else {
-        throw new Error('Failed to launch terminal');
+        throw new Error('Launch endpoint not found');
       }
+
     } catch (error) {
       console.error('[BugRadar] Quick fix error:', error);
       if (btn) {
         btn.classList.remove('br-popup-btn-fixing');
-        btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 12l2 2 4-4"/></svg> Quick Fix`;
+        btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 12l2 2 4-4"/></svg> Open Terminal`;
       }
-      alert('Make sure BugRadar dashboard is running on localhost:3000');
+
+      // Show setup instructions
+      const modal = document.createElement('div');
+      modal.style.cssText = `
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.8);
+        backdrop-filter: blur(4px);
+        z-index: 10004;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      `;
+      modal.innerHTML = `
+        <div style="background:#1E293B;border-radius:16px;padding:24px;max-width:500px;width:100%;border:1px solid rgba(255,255,255,0.1);position:relative;">
+          <button onclick="this.parentElement.parentElement.remove()" style="position:absolute;top:16px;right:16px;background:rgba(255,255,255,0.1);border:none;border-radius:8px;width:32px;height:32px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.5);">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          </button>
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+            <div style="width:40px;height:40px;background:linear-gradient(135deg,#EF4444,#DC2626);border-radius:10px;display:flex;align-items:center;justify-content:center;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 12l3 3 7-7"/></svg>
+            </div>
+            <div>
+              <h3 style="margin:0;color:white;font-size:18px;font-weight:600;">Setup Required</h3>
+              <p style="margin:4px 0 0;color:rgba(255,255,255,0.6);font-size:13px;">Add the BugRadar server helper</p>
+            </div>
+          </div>
+          <p style="color:rgba(255,255,255,0.7);font-size:14px;line-height:1.6;margin-bottom:16px;">
+            To enable auto-launch, create this file in your project:
+          </p>
+          <div style="background:#0F172A;border-radius:8px;padding:16px;margin-bottom:16px;">
+            <p style="color:rgba(255,255,255,0.5);font-size:11px;margin:0 0 8px;font-family:monospace;">app/api/bugradar/launch-claude/route.ts</p>
+            <code style="color:#10B981;font-size:13px;font-family:monospace;">export { POST } from 'bugradar/server'</code>
+          </div>
+          <p style="color:rgba(255,255,255,0.5);font-size:12px;margin:0;">
+            This endpoint runs on your local dev server and opens Terminal with Claude.
+          </p>
+        </div>
+      `;
+      document.body.appendChild(modal);
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) modal.remove();
+      });
     } finally {
       this.isFixing = false;
     }

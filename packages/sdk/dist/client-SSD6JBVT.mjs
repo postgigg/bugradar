@@ -1,6 +1,6 @@
 import {
   BugRadar
-} from "./chunk-BV4XGP5Q.mjs";
+} from "./chunk-SBLVAG7T.mjs";
 export {
   BugRadar
 };
