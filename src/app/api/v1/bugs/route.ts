@@ -339,12 +339,16 @@ Do NOT include any preamble like "Here's the description" - just write the descr
       success: true,
       bugId: bug.id,
       message: 'Bug reported successfully',
+    }, {
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+      }
     });
   } catch (error) {
     console.error('Bug report error:', error);
     return NextResponse.json(
       { success: false, error: 'Internal server error' },
-      { status: 500 }
+      { status: 500, headers: { 'Access-Control-Allow-Origin': '*' } }
     );
   }
 }
