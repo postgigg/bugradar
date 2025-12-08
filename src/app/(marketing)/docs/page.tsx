@@ -58,10 +58,25 @@ BugRadar.init('br_live_your_api_key');
         </p>
 
         <CodeBlock
-          code={`// Next.js: app/api/bugradar/launch-claude/route.ts
+          code={`// Next.js App Router
 export { POST } from 'bugradar/server';`}
           language="typescript"
           filename="app/api/bugradar/launch-claude/route.ts"
+        />
+
+        <p className="text-slate-600 dark:text-slate-400 my-4">
+          For Express / Vite / Node.js projects:
+        </p>
+
+        <CodeBlock
+          code={`import { launchClaude } from 'bugradar/server';
+
+app.post('/api/bugradar/launch-claude', async (req, res) => {
+  const result = await launchClaude(req.body);
+  res.json(result);
+});`}
+          language="typescript"
+          filename="server.js"
         />
 
         <div className="flex items-start gap-3 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl">

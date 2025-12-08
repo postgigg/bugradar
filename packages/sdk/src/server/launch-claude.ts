@@ -1,14 +1,21 @@
 /**
  * BugRadar Terminal Launch Helper
  *
- * Add this to your Next.js project to enable auto-launch from SDK overlays:
- *
+ * === Next.js App Router ===
  * // app/api/bugradar/launch-claude/route.ts
  * export { POST } from 'bugradar/server'
  *
- * Or for Pages Router:
+ * === Next.js Pages Router ===
  * // pages/api/bugradar/launch-claude.ts
  * export { default } from 'bugradar/server'
+ *
+ * === Express / Vite / Node.js ===
+ * // server.js or routes/bugradar.js
+ * import { launchClaude } from 'bugradar/server'
+ * app.post('/api/bugradar/launch-claude', async (req, res) => {
+ *   const result = await launchClaude(req.body)
+ *   res.json(result)
+ * })
  */
 
 import { exec } from 'child_process'
@@ -66,7 +73,8 @@ export default async function handler(req: any, res: any) {
   }
 }
 
-async function launchClaude(body: LaunchRequest) {
+// Export for Express / Vite / custom servers
+export async function launchClaude(body: LaunchRequest) {
   const { bugId, bugTitle, description, pageUrl, consoleErrors, projectPath, prompt } = body
 
   console.log('[BugRadar] Launching Claude for bug:', bugId)

@@ -31,7 +31,8 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 var launch_claude_exports = {};
 __export(launch_claude_exports, {
   POST: () => POST,
-  default: () => handler
+  default: () => handler,
+  launchClaude: () => launchClaude
 });
 module.exports = __toCommonJS(launch_claude_exports);
 var import_child_process = require("child_process");
@@ -171,5 +172,6 @@ curl -X POST "https://bugradar.io/api/webhooks/claude-code" \\
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
-  POST
+  POST,
+  launchClaude
 });

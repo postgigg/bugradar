@@ -136,5 +136,6 @@ curl -X POST "https://bugradar.io/api/webhooks/claude-code" \\
 }
 export {
   POST,
-  handler as default
+  handler as default,
+  launchClaude
 };
