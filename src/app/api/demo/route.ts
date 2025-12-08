@@ -113,11 +113,13 @@ export async function POST() {
     }
 
     // Create a demo project
+    const projectSlug = `demo-project-${Math.random().toString(36).substring(2, 8)}`
     const { data: project, error: projectError } = await supabaseAdmin
       .from('projects')
       .insert({
         organization_id: org.id,
         name: 'Demo Project',
+        slug: projectSlug,
         description: 'Try out BugRadar with this demo project',
         platform: 'web',
       })

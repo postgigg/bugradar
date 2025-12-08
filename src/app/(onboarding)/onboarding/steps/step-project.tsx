@@ -66,13 +66,15 @@ export function StepProject() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) throw new Error('Not authenticated')
 
-      // Get user's organization
-      const { data: membership } = await supabase
+      // Get user's most recent organization (created during this onboarding)
+      const { data: memberships } = await supabase
         .from('organization_members')
-        .select('organization_id')
+        .select('organization_id, created_at')
         .eq('user_id', user.id)
-        .single()
+        .order('created_at', { ascending: false })
+        .limit(1)
 
+      const membership = memberships?.[0]
       if (!membership) throw new Error('Organization not found')
 
       // Generate slug from name

@@ -12,11 +12,16 @@ export function BugRadarInit() {
   useEffect(() => {
     if (!mounted) return
 
+    // Determine API URL based on environment
+    const apiUrl = typeof window !== 'undefined' && window.location.hostname !== 'localhost'
+      ? `${window.location.origin}/api/v1`
+      : 'http://localhost:3000/api/v1'
+
     // Dynamic import to avoid SSR issues
     import('bugradar').then(({ BugRadar }) => {
       BugRadar.init({
-        apiKey: 'br_live_5f0d2f06696c2a1553ac74c89f4211a7',
-        apiUrl: 'http://localhost:3000/api/v1',
+        apiKey: 'br_live_b534ff163f468431bb4ea15cfbb2ef2a',
+        apiUrl,
         position: 'bottom-right',
         theme: 'auto',
       })

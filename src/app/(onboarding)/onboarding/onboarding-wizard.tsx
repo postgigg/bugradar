@@ -2,6 +2,7 @@
 
 import { useOnboardingStore } from '@/stores/onboarding-store'
 import { ProgressSteps } from '@/components/onboarding/progress-steps'
+import { StepSkillLevel } from './steps/step-skill-level'
 import { StepOrganization } from './steps/step-organization'
 import { StepPlan } from './steps/step-plan'
 import { StepProject } from './steps/step-project'
@@ -9,6 +10,7 @@ import { StepApiKey } from './steps/step-api-key'
 import { StepTest } from './steps/step-test'
 
 const steps = [
+  { title: 'Experience', description: 'Your skill level' },
   { title: 'Organization', description: 'Create your workspace' },
   { title: 'Plan', description: 'Choose your plan' },
   { title: 'Project', description: 'Set up your first project' },
@@ -23,16 +25,17 @@ export function OnboardingWizard() {
     <div className="animate-fade-in">
       <ProgressSteps
         currentStep={currentStep}
-        totalSteps={5}
+        totalSteps={6}
         steps={steps}
       />
 
       <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
-        {currentStep === 1 && <StepOrganization />}
-        {currentStep === 2 && <StepPlan />}
-        {currentStep === 3 && <StepProject />}
-        {currentStep === 4 && <StepApiKey />}
-        {currentStep === 5 && <StepTest />}
+        {currentStep === 1 && <StepSkillLevel />}
+        {currentStep === 2 && <StepOrganization />}
+        {currentStep === 3 && <StepPlan />}
+        {currentStep === 4 && <StepProject />}
+        {currentStep === 5 && <StepApiKey />}
+        {currentStep === 6 && <StepTest />}
       </div>
     </div>
   )

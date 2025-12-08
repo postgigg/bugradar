@@ -14,6 +14,7 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { formatRelativeTime } from '@/lib/utils'
+import { ButterflyHelp } from '@/components/ui/butterfly-help'
 
 interface Project {
   id: string
@@ -161,8 +162,16 @@ export function ProjectsList({ projects, canManage }: ProjectsListProps) {
           return (
             <Card key={project.id} className="p-6 hover:shadow-md transition-shadow">
               <div className="flex items-start justify-between mb-4">
-                <div className="w-10 h-10 bg-coral-100 dark:bg-coral-900/30 rounded-lg flex items-center justify-center">
-                  <Icon className="w-5 h-5 text-coral-600 dark:text-coral-400" />
+                <div className="flex items-center gap-2">
+                  <div className="w-10 h-10 bg-coral-100 dark:bg-coral-900/30 rounded-lg flex items-center justify-center">
+                    <Icon className="w-5 h-5 text-coral-600 dark:text-coral-400" />
+                  </div>
+                  <ButterflyHelp
+                    id={`project-card-${project.id}`}
+                    title="Your Project"
+                    content="This is one of your projects. Click 'View Actions' to see all bug reports, feedback, and edit requests for this project."
+                    position="right"
+                  />
                 </div>
                 {canManage && (
                   <Link href={`/dashboard/projects/${project.id}/settings`}>
@@ -204,17 +213,27 @@ export function ProjectsList({ projects, canManage }: ProjectsListProps) {
 
         {/* Add Project Card */}
         {canManage && (
-          <button
-            onClick={() => setShowCreate(true)}
-            className="border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl p-6 hover:border-coral-300 dark:hover:border-coral-700 transition-colors flex flex-col items-center justify-center min-h-[200px]"
-          >
-            <div className="w-10 h-10 bg-slate-100 dark:bg-slate-800 rounded-lg flex items-center justify-center mb-3">
-              <Plus className="w-5 h-5 text-slate-400" />
+          <div className="relative">
+            <button
+              onClick={() => setShowCreate(true)}
+              className="w-full border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl p-6 hover:border-coral-300 dark:hover:border-coral-700 transition-colors flex flex-col items-center justify-center min-h-[200px]"
+            >
+              <div className="w-10 h-10 bg-slate-100 dark:bg-slate-800 rounded-lg flex items-center justify-center mb-3">
+                <Plus className="w-5 h-5 text-slate-400" />
+              </div>
+              <span className="text-sm font-medium text-slate-600 dark:text-slate-400">
+                Create Project
+              </span>
+            </button>
+            <div className="absolute top-2 right-2">
+              <ButterflyHelp
+                id="create-project-help"
+                title="Create a Project"
+                content="Projects are where you track bugs and feedback for your apps. Each project gets its own API key to use with the BugRadar SDK."
+                position="left"
+              />
             </div>
-            <span className="text-sm font-medium text-slate-600 dark:text-slate-400">
-              Create Project
-            </span>
-          </button>
+          </div>
         )}
       </div>
 

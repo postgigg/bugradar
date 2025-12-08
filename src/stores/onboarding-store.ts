@@ -1,7 +1,10 @@
 import { create } from 'zustand'
 
 export interface OnboardingData {
-  // Step 1: Organization
+  // Step 1: Skill level
+  skillLevel: 'rookie' | 'pro' | null
+
+  // Step 2: Organization
   organization: {
     name: string
     slug: string
@@ -11,7 +14,7 @@ export interface OnboardingData {
   // Organization ID (set after creation)
   organizationId: string | null
 
-  // Step 2: Plan choice
+  // Step 3: Plan choice
   plan: 'cloud' | 'self-hosted' | null
 
   // Step 3: Project
@@ -41,6 +44,7 @@ interface OnboardingStore {
   nextStep: () => void
   prevStep: () => void
 
+  setSkillLevelChoice: (level: 'rookie' | 'pro') => void
   setOrganization: (org: OnboardingData['organization']) => void
   setOrganizationId: (id: string) => void
   setOrganizationData: (data: { organizationId?: string; plan?: 'cloud' | 'self-hosted' }) => void
@@ -53,6 +57,7 @@ interface OnboardingStore {
 }
 
 const initialData: OnboardingData = {
+  skillLevel: null,
   organization: null,
   organizationId: null,
   plan: null,
@@ -67,9 +72,12 @@ export const useOnboardingStore = create<OnboardingStore>((set) => ({
   organizationId: null,
 
   setStep: (step) => set({ currentStep: step }),
-  nextStep: () => set((state) => ({ currentStep: Math.min(state.currentStep + 1, 5) })),
+  nextStep: () => set((state) => ({ currentStep: Math.min(state.currentStep + 1, 6) })),
   prevStep: () => set((state) => ({ currentStep: Math.max(state.currentStep - 1, 1) })),
 
+  setSkillLevelChoice: (level) => set((state) => ({
+    data: { ...state.data, skillLevel: level }
+  })),
   setOrganization: (org) => set((state) => ({
     data: { ...state.data, organization: org }
   })),

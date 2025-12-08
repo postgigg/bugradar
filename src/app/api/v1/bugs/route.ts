@@ -174,7 +174,7 @@ export async function POST(request: NextRequest) {
 Report Type: ${reportType.toUpperCase()}
 Title: ${body.title}
 User Description: ${body.description || 'No description provided'}
-Page URL: ${body.context.url}
+Page URL: ${body.context?.url || 'Unknown'}
 
 Selected Elements:
 ${elementsInfo}
@@ -219,14 +219,14 @@ Do NOT include any preamble like "Here's the description" - just write the descr
         priority: body.priority || 'medium',
         status: 'new',
         source: 'sdk',
-        user_agent: body.context.userAgent,
-        browser_name: body.context.browserName,
-        browser_version: body.context.browserVersion,
-        os_name: body.context.osName,
-        os_version: body.context.osVersion,
-        device_type: body.context.deviceType,
-        screen_resolution: body.context.screenResolution,
-        page_url: body.context.url,
+        user_agent: body.context?.userAgent,
+        browser_name: body.context?.browserName,
+        browser_version: body.context?.browserVersion,
+        os_name: body.context?.osName,
+        os_version: body.context?.osVersion,
+        device_type: body.context?.deviceType,
+        screen_resolution: body.context?.screenResolution,
+        page_url: body.context?.url,
         console_logs: body.consoleLogs || [],
         network_logs: body.networkLogs || [],
         custom_metadata: body.metadata || {},

@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import {
   Bug, Zap, Camera, Sparkles, LayoutGrid,
-  Terminal, CheckCircle, ArrowRight, Code, Play,
+  Terminal, CheckCircle, ArrowRight, Code,
   MousePointer2, Eye, MessageSquare, Shield,
   Rocket, Star, ChevronRight, Github, Twitter,
   Lightbulb, PenLine, Wand2, Send, Target, Layers,
@@ -114,12 +114,6 @@ export default function LandingPage() {
                   <Button size="lg" className="group w-full sm:w-auto text-base px-8 animate-glow">
                     Start Free
                     <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-                  </Button>
-                </Link>
-                <Link href="#demo">
-                  <Button variant="outline" size="lg" className="w-full sm:w-auto text-base px-8 group">
-                    <Play className="w-4 h-4 mr-2 group-hover:scale-110 transition-transform" />
-                    Watch Demo
                   </Button>
                 </Link>
               </div>
