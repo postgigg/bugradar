@@ -2989,19 +2989,50 @@ var init_bug_overlay = __esm({
         this.overlays.forEach((overlay) => overlay.remove());
         this.overlays.clear();
         console.log("[BugRadar] Rendering overlays for", this.bugs.length, "bugs");
+        const currentPageUrl = window.location.origin + window.location.pathname;
+        const currentPageWithHash = window.location.href.split("?")[0];
         this.bugs.forEach((bug) => {
-          console.log("[BugRadar] Processing bug:", bug.id, "selector:", bug.selector, "status:", bug.status);
+          console.log("[BugRadar] Processing bug:", bug.id, "selector:", bug.selector, "status:", bug.status, "pageUrl:", bug.pageUrl);
           if (bug.selector && bug.status !== "resolved" && bug.status !== "closed") {
+            if (!this.isPageUrlMatch(bug.pageUrl, currentPageUrl, currentPageWithHash)) {
+              console.log("[BugRadar] Skipping bug - page URL mismatch:", bug.pageUrl, "vs", currentPageWithHash);
+              return;
+            }
             const element = document.querySelector(bug.selector);
             console.log("[BugRadar] Found element:", !!element, "for selector:", bug.selector);
-            if (element) {
+            if (element && this.isElementVisible(element)) {
               this.createBugBadge(bug, element);
             } else {
-              console.warn("[BugRadar] Element not found for selector:", bug.selector);
+              console.warn("[BugRadar] Element not found or not visible for selector:", bug.selector);
             }
           }
         });
         console.log("[BugRadar] Created", this.overlays.size, "badge overlays");
+      }
+      isPageUrlMatch(bugPageUrl, currentUrl, currentUrlWithHash) {
+        if (!bugPageUrl) return false;
+        const normalizedBugUrl = bugPageUrl.replace(/^https?:\/\//, "").replace(/\/$/, "");
+        const normalizedCurrentUrl = currentUrl.replace(/^https?:\/\//, "").replace(/\/$/, "");
+        const normalizedCurrentUrlWithHash = currentUrlWithHash.replace(/^https?:\/\//, "").replace(/\/$/, "");
+        const bugPath = normalizedBugUrl.split("/").slice(1).join("/").split("#")[0];
+        const currentPath = normalizedCurrentUrl.split("/").slice(1).join("/");
+        const bugPathWithHash = normalizedBugUrl.split("/").slice(1).join("/");
+        const currentPathWithHash = normalizedCurrentUrlWithHash.split("/").slice(1).join("/");
+        console.log("[BugRadar] URL match check:", {
+          bugPath,
+          currentPath,
+          bugPathWithHash,
+          currentPathWithHash
+        });
+        return bugPath === currentPath || bugPathWithHash === currentPathWithHash;
+      }
+      isElementVisible(element) {
+        const rect = element.getBoundingClientRect();
+        const style = window.getComputedStyle(element);
+        if (rect.width === 0 || rect.height === 0) return false;
+        if (style.display === "none" || style.visibility === "hidden" || style.opacity === "0") return false;
+        if (rect.bottom < 0 || rect.top > document.documentElement.scrollHeight) return false;
+        return true;
       }
       createBugBadge(bug, element) {
         const rect = element.getBoundingClientRect();

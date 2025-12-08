@@ -346,23 +346,76 @@ export class BugOverlay {
 
     console.log('[BugRadar] Rendering overlays for', this.bugs.length, 'bugs');
 
+    // Get current page URL for matching
+    const currentPageUrl = window.location.origin + window.location.pathname;
+    const currentPageWithHash = window.location.href.split('?')[0]; // URL with hash but no query
+
     // Create overlays for bugs with selectors
     this.bugs.forEach(bug => {
-      console.log('[BugRadar] Processing bug:', bug.id, 'selector:', bug.selector, 'status:', bug.status);
+      console.log('[BugRadar] Processing bug:', bug.id, 'selector:', bug.selector, 'status:', bug.status, 'pageUrl:', bug.pageUrl);
 
       if (bug.selector && bug.status !== 'resolved' && bug.status !== 'closed') {
+        // Check if the bug's page URL matches the current page
+        if (!this.isPageUrlMatch(bug.pageUrl, currentPageUrl, currentPageWithHash)) {
+          console.log('[BugRadar] Skipping bug - page URL mismatch:', bug.pageUrl, 'vs', currentPageWithHash);
+          return;
+        }
+
         const element = document.querySelector(bug.selector);
         console.log('[BugRadar] Found element:', !!element, 'for selector:', bug.selector);
 
-        if (element) {
+        if (element && this.isElementVisible(element as HTMLElement)) {
           this.createBugBadge(bug, element as HTMLElement);
         } else {
-          console.warn('[BugRadar] Element not found for selector:', bug.selector);
+          console.warn('[BugRadar] Element not found or not visible for selector:', bug.selector);
         }
       }
     });
 
     console.log('[BugRadar] Created', this.overlays.size, 'badge overlays');
+  }
+
+  private isPageUrlMatch(bugPageUrl: string | undefined, currentUrl: string, currentUrlWithHash: string): boolean {
+    if (!bugPageUrl) return false;
+
+    // Normalize the bug's page URL (remove protocol for comparison)
+    const normalizedBugUrl = bugPageUrl.replace(/^https?:\/\//, '').replace(/\/$/, '');
+    const normalizedCurrentUrl = currentUrl.replace(/^https?:\/\//, '').replace(/\/$/, '');
+    const normalizedCurrentUrlWithHash = currentUrlWithHash.replace(/^https?:\/\//, '').replace(/\/$/, '');
+
+    // Extract just the path part for comparison
+    const bugPath = normalizedBugUrl.split('/').slice(1).join('/').split('#')[0]; // Remove host and hash
+    const currentPath = normalizedCurrentUrl.split('/').slice(1).join('/');
+
+    // Also check with hash (for SPA routes like /wip#schedule)
+    const bugPathWithHash = normalizedBugUrl.split('/').slice(1).join('/');
+    const currentPathWithHash = normalizedCurrentUrlWithHash.split('/').slice(1).join('/');
+
+    console.log('[BugRadar] URL match check:', {
+      bugPath,
+      currentPath,
+      bugPathWithHash,
+      currentPathWithHash
+    });
+
+    // Match if paths are the same (with or without hash)
+    return bugPath === currentPath || bugPathWithHash === currentPathWithHash;
+  }
+
+  private isElementVisible(element: HTMLElement): boolean {
+    const rect = element.getBoundingClientRect();
+    const style = window.getComputedStyle(element);
+
+    // Check if element has size
+    if (rect.width === 0 || rect.height === 0) return false;
+
+    // Check if element is hidden via CSS
+    if (style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0') return false;
+
+    // Check if element is in viewport or page (not completely off-screen)
+    if (rect.bottom < 0 || rect.top > document.documentElement.scrollHeight) return false;
+
+    return true;
   }
 
   private createBugBadge(bug: ExistingBug, element: HTMLElement): void {
