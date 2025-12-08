@@ -3093,6 +3093,13 @@ var BugOverlay = class {
       this.config.onQuickFix(bug);
       return;
     }
+    if (this.isFixing) return;
+    this.isFixing = true;
+    const btn = this.activePopup?.querySelector('[data-action="quick-fix"]');
+    if (btn) {
+      btn.classList.add("br-popup-btn-fixing");
+      btn.innerHTML = `<div class="br-spinner"></div> Launching Claude...`;
+    }
     try {
       await fetch(`${this.config.apiUrl}/bugs/${bug.id}/status`, {
         method: "PATCH",
@@ -3102,69 +3109,40 @@ var BugOverlay = class {
         },
         body: JSON.stringify({ status: "in_progress" })
       });
-    } catch (e) {
-      console.warn("[BugRadar] Failed to update bug status:", e);
-    }
-    const prompt2 = this.buildFixPrompt(bug);
-    const projectPath = bug.projectPath || "";
-    const terminalCmd = projectPath ? `cd "${projectPath}" && claude` : "claude";
-    await navigator.clipboard.writeText(prompt2);
-    this.closePopup();
-    const terminalUrl = `terminal://${encodeURIComponent(terminalCmd)}`;
-    const opened = window.open(terminalUrl, "_blank");
-    this.showTerminalNotification(terminalCmd, prompt2);
-  }
-  showTerminalNotification(cmd, prompt2) {
-    document.getElementById("br-terminal-notification")?.remove();
-    const notification = document.createElement("div");
-    notification.id = "br-terminal-notification";
-    notification.innerHTML = `
-      <div style="position:fixed;bottom:24px;right:24px;width:380px;background:#1E293B;border:1px solid rgba(255,255,255,0.1);border-radius:16px;box-shadow:0 20px 40px rgba(0,0,0,0.4);z-index:10003;overflow:hidden;animation:br-slide-up 0.3s ease-out;">
-        <div style="padding:20px;">
-          <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
-            <div style="width:40px;height:40px;background:linear-gradient(135deg, #10B981 0%, #059669 100%);border-radius:10px;display:flex;align-items:center;justify-content:center;">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
-                <path d="M20 6L9 17l-5-5"/>
-              </svg>
-            </div>
-            <div>
-              <div style="font-size:16px;font-weight:700;color:#fff;">Prompt Copied!</div>
-              <div style="font-size:13px;color:rgba(255,255,255,0.6);">Open terminal and run Claude</div>
-            </div>
-          </div>
-          <div style="background:#0F172A;border-radius:10px;padding:14px;margin-bottom:16px;">
-            <div style="font-size:11px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px;">Run this command:</div>
-            <code style="font-family:monospace;font-size:14px;color:#10B981;word-break:break-all;">${cmd}</code>
-          </div>
-          <div style="font-size:12px;color:rgba(255,255,255,0.5);line-height:1.5;">
-            1. Open Terminal<br>
-            2. Paste command above<br>
-            3. When Claude starts, press <strong style="color:#fff;">Shift+Tab</strong><br>
-            4. Paste prompt (already copied) \u2192 Enter
-          </div>
-        </div>
-        <button id="br-close-notification" style="position:absolute;top:12px;right:12px;width:28px;height:28px;background:rgba(255,255,255,0.1);border:none;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.5);">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M18 6L6 18M6 6l12 12"/>
-          </svg>
-        </button>
-      </div>
-    `;
-    const style = document.createElement("style");
-    style.textContent = `
-      @keyframes br-slide-up {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
+      const prompt2 = this.buildFixPrompt(bug);
+      const response = await fetch("http://localhost:3000/api/terminal/launch", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          bugId: bug.id,
+          projectPath: bug.projectPath || "",
+          organizationId: "",
+          webhookUrl: "https://bugradar.io/api/webhooks/claude-code",
+          prompt: prompt2
+        })
+      });
+      if (response.ok) {
+        if (btn) {
+          btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> Launched!`;
+        }
+        setTimeout(() => {
+          this.closePopup();
+        }, 1e3);
+      } else {
+        throw new Error("Failed to launch terminal");
       }
-    `;
-    notification.appendChild(style);
-    document.body.appendChild(notification);
-    notification.querySelector("#br-close-notification")?.addEventListener("click", () => {
-      notification.remove();
-    });
-    setTimeout(() => {
-      notification.remove();
-    }, 1e4);
+    } catch (error) {
+      console.error("[BugRadar] Quick fix error:", error);
+      if (btn) {
+        btn.classList.remove("br-popup-btn-fixing");
+        btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 12l2 2 4-4"/></svg> Quick Fix`;
+      }
+      alert("Make sure BugRadar dashboard is running on localhost:3000");
+    } finally {
+      this.isFixing = false;
+    }
   }
   showQuickFixModal(bug) {
     const modal = document.createElement("div");
