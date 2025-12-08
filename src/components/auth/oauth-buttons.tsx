@@ -4,6 +4,21 @@ import { Button } from '@/components/ui/button'
 import { createClient } from '@/lib/supabase/client'
 import { useState } from 'react'
 
+// Always use the canonical domain for OAuth callbacks to avoid cookie issues
+const getRedirectUrl = () => {
+  // In production, always use bugradar.io regardless of current URL
+  // This ensures cookies are set on the correct domain
+  if (typeof window !== 'undefined') {
+    const hostname = window.location.hostname
+    // If on any netlify URL or production domain, use bugradar.io
+    if (hostname.includes('netlify.app') || hostname === 'bugradar.io') {
+      return 'https://bugradar.io/auth/callback'
+    }
+  }
+  // For local development
+  return `${typeof window !== 'undefined' ? window.location.origin : ''}/auth/callback`
+}
+
 export function OAuthButtons() {
   const [isLoading, setIsLoading] = useState<'google' | 'github' | null>(null)
   const supabase = createClient()
@@ -11,10 +26,13 @@ export function OAuthButtons() {
   const handleOAuth = async (provider: 'google' | 'github') => {
     setIsLoading(provider)
     try {
+      const redirectTo = getRedirectUrl()
+      console.log('[OAuth] Redirect URL:', redirectTo)
+
       await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
+          redirectTo,
         },
       })
     } catch (error) {

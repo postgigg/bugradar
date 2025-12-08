@@ -9,6 +9,19 @@
 [[plugins]]
   package = "@netlify/plugin-nextjs"
 
+# Redirect netlify subdomain to primary domain for consistent auth
+[[redirects]]
+  from = "https://gorgeous-taiyaki-57e388.netlify.app/*"
+  to = "https://bugradar.io/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "https://main--gorgeous-taiyaki-57e388.netlify.app/*"
+  to = "https://bugradar.io/:splat"
+  status = 301
+  force = true
+
 # Headers for security
 [[headers]]
   for = "/*"
