@@ -2684,11 +2684,13 @@ var init_bug_overlay = __esm({
       constructor(config) {
         this.bugs = [];
         this.overlays = /* @__PURE__ */ new Map();
+        this.elementHighlights = /* @__PURE__ */ new Map();
         this.activePopup = null;
         this.activeBugId = null;
         this.styleInjected = false;
         this.pollInterval = null;
         this.lastBugIds = "";
+        this.isFixing = false;
         this.config = config;
       }
       async init() {
@@ -2911,11 +2913,37 @@ var init_bug_overlay = __esm({
 
       .br-element-highlight {
         position: absolute;
-        border: 2px dashed #EF4444;
-        background: rgba(239, 68, 68, 0.1);
+        border: 3px solid #EF4444;
+        background: rgba(239, 68, 68, 0.15);
         pointer-events: none;
         z-index: 9999;
-        border-radius: 4px;
+        border-radius: 8px;
+        box-shadow: 0 0 20px rgba(239, 68, 68, 0.4), inset 0 0 20px rgba(239, 68, 68, 0.1);
+        animation: br-highlight-pulse 1.5s ease-in-out infinite;
+      }
+      @keyframes br-highlight-pulse {
+        0%, 100% { box-shadow: 0 0 20px rgba(239, 68, 68, 0.4), inset 0 0 20px rgba(239, 68, 68, 0.1); }
+        50% { box-shadow: 0 0 30px rgba(239, 68, 68, 0.6), inset 0 0 30px rgba(239, 68, 68, 0.15); }
+      }
+
+      .br-popup-btn-fixing {
+        background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%) !important;
+        cursor: wait !important;
+      }
+      .br-popup-btn-fixing:hover {
+        transform: none !important;
+      }
+
+      .br-spinner {
+        width: 18px;
+        height: 18px;
+        border: 2px solid rgba(255,255,255,0.3);
+        border-top-color: white;
+        border-radius: 50%;
+        animation: br-spin 0.8s linear infinite;
+      }
+      @keyframes br-spin {
+        to { transform: rotate(360deg); }
       }
     `;
         document.head.appendChild(style);
@@ -3005,6 +3033,12 @@ var init_bug_overlay = __esm({
       showBugPopup(bug, badge) {
         this.closePopup();
         this.activeBugId = bug.id;
+        if (bug.selector) {
+          const element = document.querySelector(bug.selector);
+          if (element) {
+            this.showElementHighlight(bug.id, element);
+          }
+        }
         const popup = document.createElement("div");
         popup.className = "br-bug-popup";
         const badgeRect = badge.getBoundingClientRect();
@@ -3069,15 +3103,79 @@ var init_bug_overlay = __esm({
         if (this.activePopup) {
           this.activePopup.remove();
           this.activePopup = null;
+        }
+        if (this.activeBugId) {
+          this.hideElementHighlight(this.activeBugId);
           this.activeBugId = null;
         }
       }
-      triggerQuickFix(bug) {
-        this.closePopup();
+      showElementHighlight(bugId, element) {
+        this.hideElementHighlight(bugId);
+        const rect = element.getBoundingClientRect();
+        const highlight = document.createElement("div");
+        highlight.className = "br-element-highlight";
+        highlight.style.left = `${rect.left + window.scrollX - 4}px`;
+        highlight.style.top = `${rect.top + window.scrollY - 4}px`;
+        highlight.style.width = `${rect.width + 8}px`;
+        highlight.style.height = `${rect.height + 8}px`;
+        document.body.appendChild(highlight);
+        this.elementHighlights.set(bugId, highlight);
+      }
+      hideElementHighlight(bugId) {
+        const highlight = this.elementHighlights.get(bugId);
+        if (highlight) {
+          highlight.remove();
+          this.elementHighlights.delete(bugId);
+        }
+      }
+      async triggerQuickFix(bug) {
         if (this.config.onQuickFix) {
+          this.closePopup();
           this.config.onQuickFix(bug);
-        } else {
+          return;
+        }
+        if (this.isFixing) return;
+        this.isFixing = true;
+        const btn = this.activePopup?.querySelector('[data-action="quick-fix"]');
+        if (btn) {
+          btn.classList.add("br-popup-btn-fixing");
+          btn.innerHTML = `<div class="br-spinner"></div> Launching Claude...`;
+        }
+        try {
+          await fetch(`${this.config.apiUrl}/bugs/${bug.id}/status`, {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+              "X-API-Key": this.config.apiKey
+            },
+            body: JSON.stringify({ status: "in_progress" })
+          });
+          const response = await fetch(`${this.config.apiUrl.replace("/api/v1", "")}/api/terminal/launch`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              bugId: bug.id,
+              projectPath: bug.projectPath || ""
+            })
+          });
+          if (response.ok) {
+            if (btn) {
+              btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> Launched!`;
+            }
+            setTimeout(() => {
+              this.closePopup();
+            }, 1e3);
+          } else {
+            throw new Error("Failed to launch terminal");
+          }
+        } catch (error) {
+          console.error("[BugRadar] Quick fix error:", error);
+          this.closePopup();
           this.showQuickFixModal(bug);
+        } finally {
+          this.isFixing = false;
         }
       }
       showQuickFixModal(bug) {
@@ -3206,6 +3304,8 @@ Please analyze this bug and implement a fix.
         this.stopPolling();
         this.overlays.forEach((overlay) => overlay.remove());
         this.overlays.clear();
+        this.elementHighlights.forEach((highlight) => highlight.remove());
+        this.elementHighlights.clear();
         this.closePopup();
         document.getElementById("bugradar-overlay-styles")?.remove();
         document.getElementById("br-quickfix-modal")?.remove();
