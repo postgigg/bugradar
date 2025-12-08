@@ -462,9 +462,11 @@ export async function GET(request: NextRequest) {
       .order('created_at', { ascending: false })
       .limit(50);
 
-    // Filter by page URL if provided
+    // Filter by page URL if provided - use ilike for flexible matching
     if (pageUrl) {
-      query = query.eq('page_url', pageUrl);
+      // Strip protocol and trailing slash for more flexible matching
+      const cleanUrl = pageUrl.replace(/^https?:\/\//, '').replace(/\/$/, '');
+      query = query.ilike('page_url', `%${cleanUrl}%`);
     }
 
     const { data: bugs, error: bugsError } = await query;

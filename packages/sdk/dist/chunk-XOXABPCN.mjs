@@ -1361,7 +1361,7 @@ var BugReporterWidget = class {
     this.consoleErrors = logs.filter((log) => log.type === "error").slice(-10).map((log, i) => ({
       id: `err_${i}`,
       time: new Date(log.timestamp).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", second: "2-digit" }),
-      message: typeof log.args[0] === "string" ? log.args[0] : JSON.stringify(log.args[0]),
+      message: log.message || "Unknown error",
       selected: false
     }));
   }
@@ -2612,6 +2612,8 @@ var BugOverlay = class {
     this.activePopup = null;
     this.activeBugId = null;
     this.styleInjected = false;
+    this.pollInterval = null;
+    this.lastBugIds = "";
     this.config = config;
   }
   async init() {
@@ -2630,6 +2632,24 @@ var BugOverlay = class {
         }
       }
     });
+    this.startPolling();
+  }
+  startPolling() {
+    this.pollInterval = setInterval(async () => {
+      await this.fetchBugs();
+      const currentBugIds = this.bugs.map((b) => `${b.id}:${b.status}`).sort().join(",");
+      if (currentBugIds !== this.lastBugIds) {
+        console.log("[BugRadar] Bugs changed, re-rendering overlays");
+        this.lastBugIds = currentBugIds;
+        this.renderOverlays();
+      }
+    }, 5e3);
+  }
+  stopPolling() {
+    if (this.pollInterval) {
+      clearInterval(this.pollInterval);
+      this.pollInterval = null;
+    }
   }
   injectStyles() {
     if (this.styleInjected) return;
@@ -2827,18 +2847,33 @@ var BugOverlay = class {
   }
   async fetchBugs() {
     try {
-      const response = await fetch(`${this.config.apiUrl}/bugs?page_url=${encodeURIComponent(window.location.href)}`, {
+      const pageUrl = window.location.origin + window.location.pathname;
+      const apiUrl = `${this.config.apiUrl}/bugs?page_url=${encodeURIComponent(pageUrl)}`;
+      console.log("[BugRadar] Fetching bugs...");
+      console.log("[BugRadar] API URL:", apiUrl);
+      console.log("[BugRadar] Page URL:", pageUrl);
+      console.log("[BugRadar] API Key:", this.config.apiKey?.substring(0, 10) + "...");
+      const response = await fetch(apiUrl, {
         headers: {
           "Authorization": `Bearer ${this.config.apiKey}`,
           "Content-Type": "application/json"
         }
       });
+      console.log("[BugRadar] Response status:", response.status);
       if (response.ok) {
         const data = await response.json();
         this.bugs = data.bugs || [];
+        console.log("[BugRadar] Fetched bugs:", this.bugs);
+        console.log("[BugRadar] Total bugs:", this.bugs.length);
+        this.bugs.forEach((bug) => {
+          console.log("[BugRadar] Bug:", bug.id, "| Selector:", bug.selector, "| Status:", bug.status);
+        });
+      } else {
+        const errorText = await response.text();
+        console.error("[BugRadar] API error:", response.status, errorText);
       }
     } catch (error) {
-      console.warn("[BugRadar] Failed to fetch bugs:", error);
+      console.error("[BugRadar] Failed to fetch bugs:", error);
     }
   }
   setBugs(bugs) {
@@ -3093,6 +3128,7 @@ Please analyze this bug and implement a fix.
     return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
   }
   destroy() {
+    this.stopPolling();
     this.overlays.forEach((overlay) => overlay.remove());
     this.overlays.clear();
     this.closePopup();
@@ -3183,13 +3219,47 @@ var BugRadarClient = class {
         (report) => this.submitReport(report)
       );
       if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", () => this.widget?.mount());
+        console.log("[BugRadar] DOM loading, waiting for DOMContentLoaded...");
+        document.addEventListener("DOMContentLoaded", () => {
+          console.log("[BugRadar] DOMContentLoaded fired, mounting widget...");
+          this.widget?.mount();
+          console.log("[BugRadar] Calling autoInitBugOverlays...");
+          this.autoInitBugOverlays();
+        });
       } else {
+        console.log("[BugRadar] DOM ready, mounting widget...");
         this.widget.mount();
+        console.log("[BugRadar] Calling autoInitBugOverlays...");
+        this.autoInitBugOverlays();
       }
     }
     this.initialized = true;
     console.log("[BugRadar] Initialized successfully");
+  }
+  /**
+   * Auto-initialize bug overlays - fetches and displays existing bugs for current page
+   */
+  async autoInitBugOverlays() {
+    console.log("[BugRadar] autoInitBugOverlays called");
+    console.log("[BugRadar] Config:", this.config ? "exists" : "null");
+    console.log("[BugRadar] API URL:", this.config?.apiUrl);
+    console.log("[BugRadar] API Key:", this.config?.apiKey?.substring(0, 10) + "...");
+    if (!this.config) {
+      console.warn("[BugRadar] No config, skipping bug overlays");
+      return;
+    }
+    try {
+      console.log("[BugRadar] Creating BugOverlay instance...");
+      this.bugOverlay = new BugOverlay({
+        apiUrl: this.config.apiUrl || DEFAULT_API_URL,
+        apiKey: this.config.apiKey
+      });
+      console.log("[BugRadar] Calling bugOverlay.init()...");
+      await this.bugOverlay.init();
+      console.log("[BugRadar] Bug overlays auto-initialized successfully");
+    } catch (error) {
+      console.error("[BugRadar] Failed to auto-init bug overlays:", error);
+    }
   }
   /**
    * Manually capture and report an error

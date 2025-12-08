@@ -139,6 +139,140 @@ export function BugDetail({ bug, teamMembers, subscription, organizationId }: Bu
     setTimeout(() => setCopied(false), 2000)
   }
 
+  // Build the fix prompt for Claude Code
+  const buildFixPrompt = () => {
+    const reportType = (bug.custom_metadata?.reportType as 'bug' | 'change' | 'feedback') || 'bug'
+    const webhookUrl = 'https://bugradar.io/api/webhooks/claude-code'
+
+    // Build elements section
+    let elementsSection = ''
+    if (bug.bug_elements && bug.bug_elements.length > 0) {
+      elementsSection = `## Selected Elements
+${bug.bug_elements.map((el: any, i: number) => {
+  let elementInfo = `${i + 1}. **<${el.element_tag}>** element`
+  if (el.element_text) elementInfo += `\n   - Text: "${el.element_text.slice(0, 100)}${el.element_text.length > 100 ? '...' : ''}"`
+  if (el.element_selector) elementInfo += `\n   - Selector: \`${el.element_selector}\``
+  if (el.annotation_note) elementInfo += `\n   - Note: ${el.annotation_note}`
+  return elementInfo
+}).join('\n\n')}
+
+`
+    }
+
+    // Build screenshot section
+    let screenshotSection = ''
+    if (bug.screenshot_url) {
+      screenshotSection = `## Screenshot - IMPORTANT: View This First!
+A screenshot of the issue has been captured. **You MUST view this screenshot before starting work.**
+
+**Screenshot URL:** ${bug.screenshot_url}
+
+**Action Required:** Use the Read tool or WebFetch tool to view this image URL.
+
+`
+    }
+
+    const typeConfig = {
+      bug: { emoji: '🐛', header: 'Bug Fix Request', typeLabel: 'Bug Report', action: 'fix this bug' },
+      feedback: { emoji: '💡', header: 'Feedback Implementation Request', typeLabel: 'Feedback / Suggestion', action: 'implement this feedback' },
+      change: { emoji: '✏️', header: 'Edit / Change Request', typeLabel: 'Edit / Change Request', action: 'implement this change' }
+    }
+    const config = typeConfig[reportType]
+
+    return `# ${config.emoji} BugRadar ${config.header}
+
+## Request Details
+- **ID:** ${bug.id}
+- **Type:** ${config.typeLabel}
+- **Title:** ${bug.title}
+${bug.page_url ? `- **Page URL:** ${bug.page_url}` : ''}
+${bug.projects?.name ? `- **Project:** ${bug.projects.name}` : ''}
+
+## Description
+${bug.description || bug.ai_enhanced_description || 'No description provided.'}
+
+${screenshotSection}${elementsSection}${consoleErrors.length ? `## Console Errors
+\`\`\`
+${consoleErrors.slice(0, 10).join('\n')}
+\`\`\`
+` : ''}
+
+## Your Task
+1. **FIRST: View the screenshot URL above** using the Read tool
+2. Analyze the issue based on the screenshot and information above
+3. Locate the elements by their selectors in the codebase
+4. Find the root cause
+5. Implement a fix
+6. Test the fix works correctly
+
+## 🚨 CRITICAL RULES - READ BEFORE MAKING ANY CHANGES
+
+### ⛔ ABSOLUTE RULE #1: NEVER RENAME VARIABLES OR DATABASE FIELDS ⛔
+
+**THIS IS THE MOST IMPORTANT RULE - VIOLATING IT WILL CRASH THE APPLICATION**
+
+#### BEFORE CHANGING ANY VARIABLE OR FIELD NAME:
+1. **STOP** - Check what the ACTUAL field name is in the database
+2. **VERIFY** - Search the codebase for ALL uses of this variable/field
+3. **COUNT IMPACT** - How many files use this name?
+4. **DO NOT CHANGE IT** - Even if the name seems wrong or inconsistent
+
+#### DATABASE IS THE SOURCE OF TRUTH:
+- If database has field \`type\`, code MUST use \`type\` (NOT \`service_type\`)
+- If database has field \`company_name\`, code MUST use \`company_name\` (NOT \`name\` or \`customerName\`)
+- NEVER create new variable names for existing database fields
+- NEVER rename database columns without explicit approval
+
+#### FORBIDDEN ACTIONS - THESE WILL BREAK THE APP:
+- ❌ Renaming database columns (e.g., \`type\` → \`service_type\`)
+- ❌ Creating new variable names for existing fields
+- ❌ "Improving" variable names that are already in use
+- ❌ Refactoring field names for "consistency"
+- ❌ Creating aliases or mappings to "fix" naming
+
+#### IMPACT ANALYSIS:
+- If changing 1 file would break 50+ files: **DON'T DO IT**
+- If database + queries use name A, but 1-2 files use name B: **FIX the 1-2 files to use name A**
+- Always choose the path with LEAST total changes
+
+### MANDATORY: Read Files First
+
+**YOU MUST READ THE FILES BEFORE MAKING ANY CHANGES:**
+1. **ALWAYS use the Read tool to read files before editing them**
+2. **NEVER create duplicate files** - check if files already exist first
+3. **NEVER guess at file contents** - always read the actual code
+4. **Use Glob tool** to find existing files before creating new ones
+5. **Check git status** to see what files already exist
+
+### Before Making ANY Code Change:
+1. ✅ Verify database field names (check schema)
+2. ✅ Count usage with grep to see how many files use a name
+3. ✅ Read all files you'll modify
+4. ✅ Check for duplicates before creating files
+5. ✅ Use existing variable names EXACTLY as they are
+6. ✅ Send webhook when done with fix
+
+---
+
+## Webhook Integration - CRITICAL
+When you complete the task, you MUST send a webhook:
+\`\`\`bash
+curl -X POST "${webhookUrl}" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "bugId": "${bug.id}",
+    "organizationId": "${organizationId}",
+    "event": "fix_completed",
+    "summary": "YOUR_SUMMARY_HERE",
+    "filesChanged": ["file1.tsx"],
+    "message": "Completed"
+  }'
+\`\`\`
+
+Please ${config.action}.
+`
+  }
+
   // Direct Claude Fix - launches terminal immediately
   const handleDirectClaudeFix = async () => {
     if (!bug.projects?.local_path) {
@@ -157,11 +291,20 @@ export function BugDetail({ bug, teamMembers, subscription, organizationId }: Bu
 
       setStatus('in_progress')
 
+      // Build the prompt
+      const prompt = buildFixPrompt()
+
       // Launch the terminal with Claude
       const response = await fetch('/api/terminal/launch', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ projectPath: bug.projects.local_path, bugId: bug.id }),
+        body: JSON.stringify({
+          projectPath: bug.projects.local_path,
+          bugId: bug.id,
+          organizationId,
+          webhookUrl: 'https://bugradar.io/api/webhooks/claude-code',
+          prompt
+        }),
       })
 
       if (!response.ok) {

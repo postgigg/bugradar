@@ -109,6 +109,10 @@ declare class BugRadarClient {
      */
     init(apiKeyOrConfig: string | BugRadarConfig): void;
     /**
+     * Auto-initialize bug overlays - fetches and displays existing bugs for current page
+     */
+    private autoInitBugOverlays;
+    /**
      * Manually capture and report an error
      */
     captureError(error: Error, additionalData?: Record<string, unknown>): Promise<void>;

@@ -80,14 +80,54 @@ class BugRadarClient {
 
       // Wait for DOM ready
       if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', () => this.widget?.mount());
+        console.log('[BugRadar] DOM loading, waiting for DOMContentLoaded...');
+        document.addEventListener('DOMContentLoaded', () => {
+          console.log('[BugRadar] DOMContentLoaded fired, mounting widget...');
+          this.widget?.mount();
+          // Auto-init bug overlays after widget is mounted
+          console.log('[BugRadar] Calling autoInitBugOverlays...');
+          this.autoInitBugOverlays();
+        });
       } else {
+        console.log('[BugRadar] DOM ready, mounting widget...');
         this.widget.mount();
+        // Auto-init bug overlays after widget is mounted
+        console.log('[BugRadar] Calling autoInitBugOverlays...');
+        this.autoInitBugOverlays();
       }
     }
 
     this.initialized = true;
     console.log('[BugRadar] Initialized successfully');
+  }
+
+  /**
+   * Auto-initialize bug overlays - fetches and displays existing bugs for current page
+   */
+  private async autoInitBugOverlays(): Promise<void> {
+    console.log('[BugRadar] autoInitBugOverlays called');
+    console.log('[BugRadar] Config:', this.config ? 'exists' : 'null');
+    console.log('[BugRadar] API URL:', this.config?.apiUrl);
+    console.log('[BugRadar] API Key:', this.config?.apiKey?.substring(0, 10) + '...');
+
+    if (!this.config) {
+      console.warn('[BugRadar] No config, skipping bug overlays');
+      return;
+    }
+
+    try {
+      console.log('[BugRadar] Creating BugOverlay instance...');
+      this.bugOverlay = new BugOverlay({
+        apiUrl: this.config.apiUrl || DEFAULT_API_URL,
+        apiKey: this.config.apiKey,
+      });
+
+      console.log('[BugRadar] Calling bugOverlay.init()...');
+      await this.bugOverlay.init();
+      console.log('[BugRadar] Bug overlays auto-initialized successfully');
+    } catch (error) {
+      console.error('[BugRadar] Failed to auto-init bug overlays:', error);
+    }
   }
 
   /**

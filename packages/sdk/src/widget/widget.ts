@@ -150,7 +150,7 @@ export class BugReporterWidget {
       .map((log, i) => ({
         id: `err_${i}`,
         time: new Date(log.timestamp).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
-        message: typeof log.args[0] === 'string' ? log.args[0] : JSON.stringify(log.args[0]),
+        message: log.message || 'Unknown error',
         selected: false,
       }));
   }

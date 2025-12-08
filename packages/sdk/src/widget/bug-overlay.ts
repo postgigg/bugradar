@@ -15,6 +15,8 @@ export class BugOverlay {
   private activePopup: HTMLDivElement | null = null;
   private activeBugId: string | null = null;
   private styleInjected = false;
+  private pollInterval: ReturnType<typeof setInterval> | null = null;
+  private lastBugIds: string = '';
 
   constructor(config: BugOverlayConfig) {
     this.config = config;
@@ -40,6 +42,31 @@ export class BugOverlay {
         }
       }
     });
+
+    // Start real-time polling for bug updates
+    this.startPolling();
+  }
+
+  private startPolling(): void {
+    // Poll every 5 seconds for new/updated bugs
+    this.pollInterval = setInterval(async () => {
+      await this.fetchBugs();
+
+      // Check if bugs have changed
+      const currentBugIds = this.bugs.map(b => `${b.id}:${b.status}`).sort().join(',');
+      if (currentBugIds !== this.lastBugIds) {
+        console.log('[BugRadar] Bugs changed, re-rendering overlays');
+        this.lastBugIds = currentBugIds;
+        this.renderOverlays();
+      }
+    }, 5000);
+  }
+
+  private stopPolling(): void {
+    if (this.pollInterval) {
+      clearInterval(this.pollInterval);
+      this.pollInterval = null;
+    }
   }
 
   private injectStyles(): void {
@@ -240,19 +267,40 @@ export class BugOverlay {
 
   private async fetchBugs(): Promise<void> {
     try {
-      const response = await fetch(`${this.config.apiUrl}/bugs?page_url=${encodeURIComponent(window.location.href)}`, {
+      // Get base URL without query string for better matching
+      const pageUrl = window.location.origin + window.location.pathname;
+      const apiUrl = `${this.config.apiUrl}/bugs?page_url=${encodeURIComponent(pageUrl)}`;
+
+      console.log('[BugRadar] Fetching bugs...');
+      console.log('[BugRadar] API URL:', apiUrl);
+      console.log('[BugRadar] Page URL:', pageUrl);
+      console.log('[BugRadar] API Key:', this.config.apiKey?.substring(0, 10) + '...');
+
+      const response = await fetch(apiUrl, {
         headers: {
           'Authorization': `Bearer ${this.config.apiKey}`,
           'Content-Type': 'application/json'
         }
       });
 
+      console.log('[BugRadar] Response status:', response.status);
+
       if (response.ok) {
         const data = await response.json();
         this.bugs = data.bugs || [];
+        console.log('[BugRadar] Fetched bugs:', this.bugs);
+        console.log('[BugRadar] Total bugs:', this.bugs.length);
+
+        // Log each bug's selector
+        this.bugs.forEach(bug => {
+          console.log('[BugRadar] Bug:', bug.id, '| Selector:', bug.selector, '| Status:', bug.status);
+        });
+      } else {
+        const errorText = await response.text();
+        console.error('[BugRadar] API error:', response.status, errorText);
       }
     } catch (error) {
-      console.warn('[BugRadar] Failed to fetch bugs:', error);
+      console.error('[BugRadar] Failed to fetch bugs:', error);
     }
   }
 
@@ -561,6 +609,7 @@ Please analyze this bug and implement a fix.
   }
 
   destroy(): void {
+    this.stopPolling();
     this.overlays.forEach(overlay => overlay.remove());
     this.overlays.clear();
     this.closePopup();

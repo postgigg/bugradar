@@ -69,7 +69,7 @@ export function ClaudeTerminalLauncher({
   // Set webhook URL on client side only
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      setWebhookUrl(`${window.location.origin}/api/webhooks/claude-code`)
+      setWebhookUrl('https://bugradar.io/api/webhooks/claude-code')
     }
   }, [])
 
