@@ -1,13 +1,26 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 
+// Always use production domain for redirects
+const getBaseUrl = (requestUrl: string) => {
+  const url = new URL(requestUrl)
+  // In production, always redirect to bugradar.io regardless of internal Netlify URL
+  if (url.hostname.includes('netlify.app') || url.hostname === 'bugradar.io') {
+    return 'https://bugradar.io'
+  }
+  // Local development
+  return url.origin
+}
+
 export async function GET(request: Request) {
-  const { searchParams, origin } = new URL(request.url)
+  const { searchParams } = new URL(request.url)
   const code = searchParams.get('code')
   const next = searchParams.get('next') ?? '/dashboard'
 
+  const baseUrl = getBaseUrl(request.url)
+
   console.log('[Auth Callback] Request URL:', request.url)
-  console.log('[Auth Callback] Origin:', origin)
+  console.log('[Auth Callback] Base URL:', baseUrl)
   console.log('[Auth Callback] Code:', code ? 'present' : 'missing')
 
   if (code) {
@@ -28,13 +41,13 @@ export async function GET(request: Request) {
           .single()
 
         const redirectTo = profile?.onboarding_completed ? next : '/onboarding'
-        console.log('[Auth Callback] Success, redirecting to:', redirectTo)
-        return NextResponse.redirect(`${origin}${redirectTo}`)
+        console.log('[Auth Callback] Success, redirecting to:', `${baseUrl}${redirectTo}`)
+        return NextResponse.redirect(`${baseUrl}${redirectTo}`)
       }
     }
   }
 
   // Return to login with error
   console.log('[Auth Callback] Failed, redirecting to login')
-  return NextResponse.redirect(`${origin}/login?error=auth_callback_error`)
+  return NextResponse.redirect(`${baseUrl}/login?error=auth_callback_error`)
 }
