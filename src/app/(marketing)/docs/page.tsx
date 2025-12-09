@@ -1,13 +1,13 @@
 import { Metadata } from 'next'
 import Link from 'next/link'
-import { ArrowRight, Zap, Shield, Code2, Sparkles, Bug, Lightbulb, PenLine, Terminal } from 'lucide-react'
+import { ArrowRight, Zap, Shield, Code2, Sparkles, Bug, Terminal, Github, Database, Mail, Bot, Server, CheckCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { CodeBlock } from '@/components/docs/code-block'
 
 export const metadata: Metadata = {
-  title: 'Documentation | BugRadar SDK',
-  description: 'Complete guide to integrating BugRadar SDK into your application',
+  title: 'Documentation | BugRadar',
+  description: 'Complete guide to self-hosting BugRadar',
 }
 
 export default function DocsPage() {
@@ -15,111 +15,224 @@ export default function DocsPage() {
     <div className="prose prose-slate dark:prose-invert max-w-none">
       {/* Header */}
       <div className="not-prose mb-12">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-coral-100 dark:bg-coral-900/30 text-coral-600 dark:text-coral-400 text-sm font-medium mb-4">
-          <Sparkles className="w-4 h-4" />
-          <span>BugRadar SDK Documentation</span>
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 text-sm font-medium mb-4">
+          <Github className="w-4 h-4" />
+          <span>Open Source & Self-Hosted</span>
         </div>
         <h1 className="text-4xl font-bold text-slate-900 dark:text-white mb-4">
-          Introduction
+          Getting Started
         </h1>
         <p className="text-xl text-slate-600 dark:text-slate-400">
-          AI-powered bug tracking SDK. Capture bugs visually with 3 lines of code.
+          Self-hosted bug tracking with AI. Free forever. Your data stays on your infrastructure.
         </p>
       </div>
 
-      {/* Quick Start */}
+      {/* Why Self-Hosted */}
+      <div className="not-prose mb-12">
+        <div className="grid md:grid-cols-3 gap-4">
+          {[
+            { icon: Shield, title: 'Your Data', desc: 'Bugs stored in your Supabase' },
+            { icon: Server, title: 'Your Servers', desc: 'Deploy anywhere you want' },
+            { icon: Github, title: 'Open Source', desc: 'MIT License, modify freely' },
+          ].map((item, i) => (
+            <Card key={i} className="p-4 border-slate-200 dark:border-slate-700">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+                  <item.icon className="w-5 h-5 text-green-600 dark:text-green-400" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-slate-900 dark:text-white">{item.title}</h3>
+                  <p className="text-sm text-slate-500">{item.desc}</p>
+                </div>
+              </div>
+            </Card>
+          ))}
+        </div>
+      </div>
+
+      {/* Prerequisites */}
       <div className="not-prose mb-12">
         <h2 className="text-2xl font-semibold text-slate-900 dark:text-white mb-4">
-          Quick Start
+          Prerequisites
         </h2>
         <p className="text-slate-600 dark:text-slate-400 mb-6">
-          Get BugRadar up and running in your application in under 2 minutes.
+          Create free accounts with these services:
         </p>
 
-        <CodeBlock
-          code={`npm install bugradar`}
-          language="bash"
-          filename="terminal"
-          showLineNumbers={false}
-        />
+        <div className="grid md:grid-cols-3 gap-4">
+          {[
+            {
+              icon: Database,
+              name: 'Supabase',
+              desc: 'Database, auth, storage',
+              free: '500MB DB, 1GB storage',
+              link: 'https://supabase.com',
+              color: 'emerald'
+            },
+            {
+              icon: Bot,
+              name: 'Anthropic',
+              desc: 'Claude AI for analysis',
+              free: '~$0.01 per bug report',
+              link: 'https://console.anthropic.com',
+              color: 'orange'
+            },
+            {
+              icon: Mail,
+              name: 'Resend',
+              desc: 'Email notifications',
+              free: '100 emails/day free',
+              link: 'https://resend.com',
+              color: 'blue'
+            },
+          ].map((service, i) => (
+            <Card key={i} className="p-4 border-slate-200 dark:border-slate-700">
+              <div className={`w-10 h-10 rounded-lg bg-${service.color}-100 dark:bg-${service.color}-900/30 flex items-center justify-center mb-3`}>
+                <service.icon className={`w-5 h-5 text-${service.color}-600 dark:text-${service.color}-400`} />
+              </div>
+              <h3 className="font-semibold text-slate-900 dark:text-white">{service.name}</h3>
+              <p className="text-sm text-slate-500 mb-2">{service.desc}</p>
+              <p className="text-xs text-green-600 dark:text-green-400 mb-3">{service.free}</p>
+              <a href={service.link} target="_blank" className="text-coral-500 hover:text-coral-600 text-sm font-medium">
+                Get started →
+              </a>
+            </Card>
+          ))}
+        </div>
+      </div>
 
-        <CodeBlock
-          code={`import { BugRadar } from 'bugradar';
+      {/* Installation */}
+      <div className="not-prose mb-12">
+        <h2 className="text-2xl font-semibold text-slate-900 dark:text-white mb-4">
+          Installation
+        </h2>
 
-BugRadar.init('br_live_your_api_key');
-
-// That's it! AI-powered bug tracking is now active.`}
-          language="typescript"
-          filename="src/index.tsx"
-        />
-
-        <p className="text-slate-600 dark:text-slate-400 my-4">
-          To enable auto-launch of Claude Code from bug overlays, add this API route:
-        </p>
-
-        <CodeBlock
-          code={`// Next.js App Router
-export { POST } from 'bugradar/server';`}
-          language="typescript"
-          filename="app/api/bugradar/launch-claude/route.ts"
-        />
-
-        <p className="text-slate-600 dark:text-slate-400 my-4">
-          For Express / Vite / Node.js projects:
-        </p>
-
-        <CodeBlock
-          code={`import { launchClaude } from 'bugradar/server';
-
-app.post('/api/bugradar/launch-claude', async (req, res) => {
-  const result = await launchClaude(req.body);
-  res.json(result);
-});`}
-          language="typescript"
-          filename="server.js"
-        />
-
-        <div className="flex items-start gap-3 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl">
-          <Shield className="w-5 h-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
+        <div className="space-y-6">
           <div>
-            <p className="font-medium text-green-900 dark:text-green-100 mb-1">You're all set!</p>
-            <p className="text-sm text-green-700 dark:text-green-300">
-              Users can now click the bug button to report issues visually. The SDK automatically captures screenshots, console logs, network requests, and browser context.
+            <h3 className="text-lg font-medium text-slate-900 dark:text-white mb-3 flex items-center gap-2">
+              <span className="w-6 h-6 rounded-full bg-coral-500 text-white text-sm flex items-center justify-center">1</span>
+              Clone the repository
+            </h3>
+            <CodeBlock
+              code={`git clone https://github.com/postgigg/bugradar.git
+cd bugradar`}
+              language="bash"
+              filename="terminal"
+              showLineNumbers={false}
+            />
+          </div>
+
+          <div>
+            <h3 className="text-lg font-medium text-slate-900 dark:text-white mb-3 flex items-center gap-2">
+              <span className="w-6 h-6 rounded-full bg-coral-500 text-white text-sm flex items-center justify-center">2</span>
+              Install dependencies
+            </h3>
+            <CodeBlock
+              code={`npm install`}
+              language="bash"
+              filename="terminal"
+              showLineNumbers={false}
+            />
+          </div>
+
+          <div>
+            <h3 className="text-lg font-medium text-slate-900 dark:text-white mb-3 flex items-center gap-2">
+              <span className="w-6 h-6 rounded-full bg-coral-500 text-white text-sm flex items-center justify-center">3</span>
+              Configure environment
+            </h3>
+            <CodeBlock
+              code={`cp .env.example .env.local`}
+              language="bash"
+              filename="terminal"
+              showLineNumbers={false}
+            />
+            <p className="text-sm text-slate-600 dark:text-slate-400 my-3">
+              Edit <code className="px-1.5 py-0.5 bg-slate-100 dark:bg-slate-800 rounded">.env.local</code> with your credentials:
             </p>
+            <CodeBlock
+              code={`# Supabase
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGci...
+SUPABASE_SERVICE_ROLE_KEY=eyJhbGci...
+
+# Anthropic
+ANTHROPIC_API_KEY=sk-ant-api03-...
+
+# Resend
+RESEND_API_KEY=re_...`}
+              language="bash"
+              filename=".env.local"
+            />
+          </div>
+
+          <div>
+            <h3 className="text-lg font-medium text-slate-900 dark:text-white mb-3 flex items-center gap-2">
+              <span className="w-6 h-6 rounded-full bg-coral-500 text-white text-sm flex items-center justify-center">4</span>
+              Set up database
+            </h3>
+            <CodeBlock
+              code={`npx supabase db push`}
+              language="bash"
+              filename="terminal"
+              showLineNumbers={false}
+            />
+          </div>
+
+          <div>
+            <h3 className="text-lg font-medium text-slate-900 dark:text-white mb-3 flex items-center gap-2">
+              <span className="w-6 h-6 rounded-full bg-coral-500 text-white text-sm flex items-center justify-center">5</span>
+              Start the app
+            </h3>
+            <CodeBlock
+              code={`npm run dev`}
+              language="bash"
+              filename="terminal"
+              showLineNumbers={false}
+            />
+          </div>
+
+          <div className="flex items-start gap-3 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl">
+            <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="font-medium text-green-900 dark:text-green-100 mb-1">You&apos;re ready!</p>
+              <p className="text-sm text-green-700 dark:text-green-300">
+                Open <a href="http://localhost:3000" className="underline">http://localhost:3000</a> and complete the onboarding wizard.
+              </p>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Features Overview */}
+      {/* Features */}
       <div className="not-prose mb-12">
         <h2 className="text-2xl font-semibold text-slate-900 dark:text-white mb-6">
-          What You Get
+          Features
         </h2>
         <div className="grid md:grid-cols-2 gap-4">
           {[
             {
-              icon: Zap,
+              icon: Bug,
               title: 'Visual Bug Reporting',
-              desc: 'Users click elements, capture screenshots, and describe issues',
+              desc: 'Screenshot capture with annotation tools',
               color: 'coral'
             },
             {
               icon: Sparkles,
               title: 'AI Enhancement',
-              desc: 'Claude AI transforms reports into actionable bug tickets',
+              desc: 'Claude AI analyzes and enriches bug reports',
               color: 'amber'
             },
             {
-              icon: Shield,
-              title: 'Auto Error Capture',
-              desc: 'JavaScript errors automatically become bug reports',
-              color: 'green'
+              icon: Zap,
+              title: 'Full Context',
+              desc: 'Console logs, network requests, browser info',
+              color: 'blue'
             },
             {
               icon: Code2,
-              title: 'Full Context',
-              desc: 'Screenshots, console logs, network logs, device info',
-              color: 'amber'
+              title: 'Team Collaboration',
+              desc: 'Invite team, assign bugs, track progress',
+              color: 'green'
             },
           ].map((feature, i) => (
             <Card key={i} className="p-4 hover:shadow-lg transition-all duration-300 border-slate-200 dark:border-slate-700">
@@ -141,138 +254,55 @@ app.post('/api/bugradar/launch-claude', async (req, res) => {
         </div>
       </div>
 
-      {/* Three Report Modes */}
+      {/* Deployment */}
       <div className="not-prose mb-12">
-        <h2 className="text-2xl font-semibold text-slate-900 dark:text-white mb-6">
-          Three Report Modes
+        <h2 className="text-2xl font-semibold text-slate-900 dark:text-white mb-4">
+          Deployment
         </h2>
         <p className="text-slate-600 dark:text-slate-400 mb-6">
-          Choose the right mode for what you&apos;re reporting. Each generates tailored AI prompts.
+          Deploy BugRadar anywhere you can run a Node.js application.
         </p>
-        <div className="grid md:grid-cols-3 gap-4">
-          {[
-            {
-              emoji: '🐛',
-              title: 'Bug Report',
-              desc: 'Report broken functionality with error context',
-              color: 'coral'
-            },
-            {
-              emoji: '💡',
-              title: 'Feedback / Suggestion',
-              desc: 'Submit feature ideas and improvements',
-              color: 'amber'
-            },
-            {
-              emoji: '✏️',
-              title: 'Edit / Change',
-              desc: 'Request specific modifications to elements',
-              color: 'blue'
-            },
-          ].map((mode, i) => (
-            <Card key={i} className="p-4 hover:shadow-lg transition-all duration-300 border-slate-200 dark:border-slate-700">
-              <div className="flex items-center gap-3 mb-2">
-                <span className="text-2xl">{mode.emoji}</span>
-                <h3 className="font-semibold text-slate-900 dark:text-white">
-                  {mode.title}
-                </h3>
-              </div>
-              <p className="text-sm text-slate-600 dark:text-slate-400">
-                {mode.desc}
-              </p>
-            </Card>
-          ))}
-        </div>
-      </div>
 
-      {/* Claude Code Integration */}
-      <div className="not-prose mb-12">
-        <h2 className="text-2xl font-semibold text-slate-900 dark:text-white mb-4 flex items-center gap-3">
-          <Terminal className="w-6 h-6 text-coral-500" />
-          Claude Code Integration
-        </h2>
-        <p className="text-slate-600 dark:text-slate-400 mb-4">
-          One-click to launch Claude Code with full bug context in your terminal. The dashboard includes a
-          &quot;Launch Claude Code&quot; button that:
-        </p>
-        <ul className="space-y-2 text-slate-600 dark:text-slate-400">
-          <li className="flex items-center gap-2">
-            <span className="text-coral-500">•</span>
-            Auto-opens Terminal with your project directory
-          </li>
-          <li className="flex items-center gap-2">
-            <span className="text-coral-500">•</span>
-            Starts Claude Code and pastes the full bug context
-          </li>
-          <li className="flex items-center gap-2">
-            <span className="text-coral-500">•</span>
-            Includes screenshot URL so Claude can view the visual context
-          </li>
-          <li className="flex items-center gap-2">
-            <span className="text-coral-500">•</span>
-            Sends webhook notification when the fix is complete
-          </li>
-        </ul>
-        <div className="mt-4 p-4 bg-coral-50 dark:bg-coral-900/20 border border-coral-200 dark:border-coral-800 rounded-xl">
-          <p className="text-sm text-coral-700 dark:text-coral-300">
-            <strong>Note:</strong> Claude Code integration requires macOS. Accessibility permissions must be granted for Terminal automation.
-          </p>
-        </div>
-      </div>
-
-      {/* Navigation Cards */}
-      <div className="not-prose mb-12">
-        <h2 className="text-2xl font-semibold text-slate-900 dark:text-white mb-6">
-          Next Steps
-        </h2>
         <div className="grid md:grid-cols-2 gap-6">
-          <Link href="/docs/installation" className="group">
-            <Card className="p-6 h-full hover:shadow-xl hover:border-coral-500 dark:hover:border-coral-500 transition-all duration-300 border-slate-200 dark:border-slate-700">
-              <h3 className="font-semibold text-lg text-slate-900 dark:text-white mb-2 group-hover:text-coral-500 transition-colors flex items-center gap-2">
-                Installation Guide
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </h3>
-              <p className="text-sm text-slate-600 dark:text-slate-400">
-                Detailed installation instructions for all JavaScript frameworks and environments.
-              </p>
-            </Card>
-          </Link>
+          <Card className="p-6 border-slate-200 dark:border-slate-700">
+            <h3 className="font-semibold text-lg text-slate-900 dark:text-white mb-2">
+              Vercel
+            </h3>
+            <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
+              One-click deploy with automatic builds and previews.
+            </p>
+            <a href="https://vercel.com/new/clone?repository-url=https://github.com/postgigg/bugradar" target="_blank">
+              <Button size="sm">Deploy to Vercel</Button>
+            </a>
+          </Card>
 
-          <Link href="/docs/configuration" className="group">
-            <Card className="p-6 h-full hover:shadow-xl hover:border-coral-500 dark:hover:border-coral-500 transition-all duration-300 border-slate-200 dark:border-slate-700">
-              <h3 className="font-semibold text-lg text-slate-900 dark:text-white mb-2 group-hover:text-coral-500 transition-colors flex items-center gap-2">
-                Configuration Options
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </h3>
-              <p className="text-sm text-slate-600 dark:text-slate-400">
-                Learn about all available configuration options to customize BugRadar for your needs.
-              </p>
-            </Card>
-          </Link>
+          <Card className="p-6 border-slate-200 dark:border-slate-700">
+            <h3 className="font-semibold text-lg text-slate-900 dark:text-white mb-2">
+              Netlify
+            </h3>
+            <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
+              Fork the repo and connect to your Netlify account.
+            </p>
+            <a href="https://app.netlify.com/start" target="_blank">
+              <Button size="sm" variant="outline">Deploy to Netlify</Button>
+            </a>
+          </Card>
+        </div>
 
-          <Link href="/docs/api-reference" className="group">
-            <Card className="p-6 h-full hover:shadow-xl hover:border-coral-500 dark:hover:border-coral-500 transition-all duration-300 border-slate-200 dark:border-slate-700">
-              <h3 className="font-semibold text-lg text-slate-900 dark:text-white mb-2 group-hover:text-coral-500 transition-colors flex items-center gap-2">
-                API Reference
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </h3>
-              <p className="text-sm text-slate-600 dark:text-slate-400">
-                Complete API documentation for all SDK methods and configuration options.
-              </p>
-            </Card>
-          </Link>
+        <div className="mt-6">
+          <h3 className="text-lg font-medium text-slate-900 dark:text-white mb-3">
+            Manual Deployment
+          </h3>
+          <CodeBlock
+            code={`# Build for production
+npm run build
 
-          <Link href="/docs/examples" className="group">
-            <Card className="p-6 h-full hover:shadow-xl hover:border-coral-500 dark:hover:border-coral-500 transition-all duration-300 border-slate-200 dark:border-slate-700">
-              <h3 className="font-semibold text-lg text-slate-900 dark:text-white mb-2 group-hover:text-coral-500 transition-colors flex items-center gap-2">
-                Code Examples
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </h3>
-              <p className="text-sm text-slate-600 dark:text-slate-400">
-                Real-world examples for React, Next.js, Vue, Svelte, and more.
-              </p>
-            </Card>
-          </Link>
+# Start production server
+npm start`}
+            language="bash"
+            filename="terminal"
+            showLineNumbers={false}
+          />
         </div>
       </div>
 
@@ -283,17 +313,23 @@ app.post('/api/bugradar/launch-claude', async (req, res) => {
             Need Help?
           </h3>
           <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
-            Check out our troubleshooting guide or reach out to our support team.
+            Check out our GitHub for issues, discussions, and source code.
           </p>
           <div className="flex gap-3">
-            <Link href="/docs/troubleshooting">
+            <a href="https://github.com/postgigg/bugradar/issues" target="_blank">
               <Button variant="outline" size="sm">
-                Troubleshooting
+                Report Issue
               </Button>
-            </Link>
-            <a href="mailto:support@bugradar.io">
+            </a>
+            <a href="https://github.com/postgigg/bugradar/discussions" target="_blank">
               <Button variant="outline" size="sm">
-                Contact Support
+                Discussions
+              </Button>
+            </a>
+            <a href="https://github.com/postgigg/bugradar" target="_blank">
+              <Button size="sm">
+                <Github className="w-4 h-4 mr-2" />
+                View Source
               </Button>
             </a>
           </div>

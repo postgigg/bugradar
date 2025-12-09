@@ -9,15 +9,14 @@ import { Label } from '@/components/ui/label'
 import {
   Server, ArrowRight,
   Database, Bot, Mail, Eye, EyeOff, Loader2,
-  CheckCircle2, XCircle, AlertCircle, ExternalLink
+  CheckCircle2, XCircle, AlertCircle, ExternalLink, Bug
 } from 'lucide-react'
-import { createClient } from '@/lib/supabase/client'
 
 export function StepPlan() {
-  const { nextStep, organizationId } = useOnboardingStore()
-  const supabase = createClient()
+  const { nextStep } = useOnboardingStore()
 
   const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   // Self-hosted form state
   const [supabaseUrl, setSupabaseUrl] = useState('')
@@ -29,14 +28,12 @@ export function StepPlan() {
 
   // Validation
   const [validations, setValidations] = useState<Record<string, { valid: boolean; message: string } | null>>({})
-  const [validating, setValidating] = useState<Record<string, boolean>>({})
 
   const toggleShowKey = (key: string) => {
     setShowKeys(prev => ({ ...prev, [key]: !prev[key] }))
   }
 
   async function validateKey(type: string, data: any) {
-    setValidating(v => ({ ...v, [type]: true }))
     try {
       const res = await fetch('/api/validate-keys', {
         method: 'POST',
@@ -49,14 +46,14 @@ export function StepPlan() {
     } catch {
       setValidations(v => ({ ...v, [type]: { valid: false, message: 'Validation failed' } }))
       return false
-    } finally {
-      setValidating(v => ({ ...v, [type]: false }))
     }
   }
 
   async function handleContinue() {
-    // Validate all keys
+    setError(null)
     setIsLoading(true)
+
+    // Validate all keys
     const results = await Promise.all([
       validateKey('supabase', { url: supabaseUrl, anonKey: supabaseAnonKey }),
       validateKey('anthropic', { apiKey: anthropicKey }),
@@ -64,24 +61,27 @@ export function StepPlan() {
     ])
 
     if (results.every(r => r)) {
-      // Save self-hosted settings
+      // Save to environment configuration
       try {
-        await supabase
-          .from('organizations')
-          .update({
-            self_hosted_enabled: true,
-            self_hosted_purchased_at: new Date().toISOString(),
-            custom_supabase_url: supabaseUrl,
-            custom_supabase_anon_key: supabaseAnonKey,
-            custom_supabase_service_key: supabaseServiceKey,
-            custom_anthropic_key: anthropicKey,
-            custom_resend_key: resendKey,
-          })
-          .eq('id', organizationId)
+        const res = await fetch('/api/setup/save-config', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            supabaseUrl,
+            supabaseAnonKey,
+            supabaseServiceKey,
+            anthropicKey,
+            resendKey,
+          }),
+        })
 
-        nextStep()
+        if (res.ok) {
+          nextStep()
+        } else {
+          setError('Failed to save configuration. Please try again.')
+        }
       } catch (err) {
-        console.error('Failed to save settings:', err)
+        setError('Failed to save configuration. Please try again.')
       }
     }
     setIsLoading(false)
@@ -92,14 +92,14 @@ export function StepPlan() {
   return (
     <div className="p-8">
       <div className="text-center mb-8">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 mb-4">
-          <Server className="w-8 h-8 text-slate-600 dark:text-slate-400" />
+        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-coral-100 dark:bg-coral-900/30 mb-4">
+          <Bug className="w-8 h-8 text-coral-600 dark:text-coral-400" />
         </div>
         <h2 className="text-2xl font-semibold text-slate-900 dark:text-white mb-2">
-          Connect Your Services
+          Set Up BugRadar
         </h2>
         <p className="text-slate-500 dark:text-slate-400">
-          BugRadar is self-hosted. Connect your own accounts for complete data ownership.
+          Connect your services to get started. All have free tiers.
         </p>
       </div>
 
@@ -108,13 +108,22 @@ export function StepPlan() {
           <div className="flex gap-3">
             <AlertCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
             <div className="text-sm">
-              <p className="font-medium text-blue-800 dark:text-blue-300">Free & Open Source</p>
+              <p className="font-medium text-blue-800 dark:text-blue-300">Self-Hosted & Free</p>
               <p className="text-blue-700 dark:text-blue-400 mt-1">
-                All services below have free tiers. Your data is stored on your own infrastructure - we never see it.
+                Your data is stored on your own infrastructure. We never see it.
               </p>
             </div>
           </div>
         </Card>
+
+        {error && (
+          <Card className="p-4 bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800">
+            <div className="flex gap-3">
+              <XCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+              <p className="text-sm text-red-700 dark:text-red-300">{error}</p>
+            </div>
+          </Card>
+        )}
 
         {/* Supabase */}
         <Card className="p-6">
@@ -234,7 +243,7 @@ export function StepPlan() {
           {isLoading ? (
             <Loader2 className="w-4 h-4 mr-2 animate-spin" />
           ) : null}
-          Validate & Continue
+          Validate & Complete Setup
           <ArrowRight className="w-4 h-4 ml-2" />
         </Button>
       </div>

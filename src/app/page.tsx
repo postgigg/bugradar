@@ -1,12 +1,11 @@
 import Link from 'next/link'
-import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import {
   Bug, Github, Terminal, CheckCircle, ArrowRight,
-  Server, Lock, Database, Mail, Sparkles, Copy,
-  Shield, Rocket, ChevronRight, Star, Zap, Eye,
-  MousePointer2, Code, Users
+  Server, Lock, Database, Mail, Sparkles,
+  Shield, Rocket, Zap, Eye,
+  MousePointer2, Code, Users, Star
 } from 'lucide-react'
 
 export default function LandingPage() {
@@ -27,7 +26,7 @@ export default function LandingPage() {
                 <Github className="w-4 h-4" />
                 <span>Star on GitHub</span>
               </Link>
-              <Link href="/login">
+              <Link href="/onboarding">
                 <Button size="sm" className="rounded-full px-5">Get Started</Button>
               </Link>
             </div>
@@ -71,7 +70,7 @@ export default function LandingPage() {
 
               {/* CTAs */}
               <div className="mt-10 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
-                <Link href="/signup">
+                <Link href="/onboarding">
                   <Button size="lg" className="group rounded-full text-base px-8 h-12 shadow-lg shadow-coral-500/25">
                     Start Free
                     <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
@@ -110,13 +109,13 @@ export default function LandingPage() {
             {/* Right Content - App Preview */}
             <div className="relative">
               {/* Floating Elements */}
-              <div className="absolute -top-6 -left-6 w-14 h-14 bg-white dark:bg-slate-800 rounded-2xl shadow-xl flex items-center justify-center animate-float z-10 border border-slate-100 dark:border-slate-700">
+              <div className="absolute -top-6 -left-6 w-14 h-14 bg-white dark:bg-slate-800 rounded-2xl shadow-xl flex items-center justify-center z-10 border border-slate-100 dark:border-slate-700">
                 <Bug className="w-7 h-7 text-coral-500" />
               </div>
-              <div className="absolute -bottom-4 -right-4 w-12 h-12 bg-white dark:bg-slate-800 rounded-xl shadow-xl flex items-center justify-center animate-float-slow z-10 border border-slate-100 dark:border-slate-700">
+              <div className="absolute -bottom-4 -right-4 w-12 h-12 bg-white dark:bg-slate-800 rounded-xl shadow-xl flex items-center justify-center z-10 border border-slate-100 dark:border-slate-700">
                 <Sparkles className="w-6 h-6 text-amber-500" />
               </div>
-              <div className="absolute top-1/3 -right-8 w-10 h-10 bg-green-500 rounded-full shadow-xl flex items-center justify-center animate-bounce-slow z-10">
+              <div className="absolute top-1/3 -right-8 w-10 h-10 bg-green-500 rounded-full shadow-xl flex items-center justify-center z-10">
                 <CheckCircle className="w-5 h-5 text-white" />
               </div>
 
@@ -364,7 +363,7 @@ export default function LandingPage() {
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link href="/signup">
+            <Link href="/onboarding">
               <Button size="lg" className="rounded-full text-base px-10 h-12 bg-white text-slate-900 hover:bg-slate-100">
                 Start Free
                 <ArrowRight className="w-4 h-4 ml-2" />
