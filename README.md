@@ -103,6 +103,32 @@ Open [http://localhost:3000](http://localhost:3000) and complete the onboarding 
 
 ---
 
+## SDK Installation (Capture Bugs in Your Apps)
+
+Once your dashboard is running, install the SDK in your apps to capture bugs:
+
+```bash
+npm install bugradar
+```
+
+```javascript
+import { BugRadar } from 'bugradar'
+
+BugRadar.init({
+  apiKey: 'br_live_xxx',  // from Dashboard > Settings > API Keys
+  apiUrl: 'https://your-dashboard.vercel.app/api/v1'  // your dashboard URL
+})
+```
+
+That's it! A floating bug button appears. Users click it to:
+- Capture annotated screenshots
+- Add descriptions
+- Submit bugs to your dashboard
+
+See the full [SDK documentation](./packages/sdk/README.md) for all options.
+
+---
+
 ## Features
 
 ### Visual Bug Capture

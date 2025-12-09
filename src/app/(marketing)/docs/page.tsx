@@ -203,6 +203,88 @@ RESEND_API_KEY=re_...`}
         </div>
       </div>
 
+      {/* SDK Integration */}
+      <div className="not-prose mb-12">
+        <h2 className="text-2xl font-semibold text-slate-900 dark:text-white mb-4">
+          SDK Integration
+        </h2>
+        <p className="text-slate-600 dark:text-slate-400 mb-6">
+          Install the SDK in your apps to capture bugs and send them to your dashboard.
+        </p>
+
+        <div className="space-y-6">
+          <div>
+            <h3 className="text-lg font-medium text-slate-900 dark:text-white mb-3 flex items-center gap-2">
+              <span className="w-6 h-6 rounded-full bg-coral-500 text-white text-sm flex items-center justify-center">1</span>
+              Install the package
+            </h3>
+            <CodeBlock
+              code={`npm install bugradar`}
+              language="bash"
+              filename="terminal"
+              showLineNumbers={false}
+            />
+          </div>
+
+          <div>
+            <h3 className="text-lg font-medium text-slate-900 dark:text-white mb-3 flex items-center gap-2">
+              <span className="w-6 h-6 rounded-full bg-coral-500 text-white text-sm flex items-center justify-center">2</span>
+              Initialize in your app
+            </h3>
+            <CodeBlock
+              code={`import { BugRadar } from 'bugradar'
+
+BugRadar.init({
+  apiKey: 'br_live_xxx',  // from Dashboard > Settings > API Keys
+  apiUrl: 'https://your-dashboard.vercel.app/api/v1'  // your dashboard URL
+})`}
+              language="javascript"
+              filename="app.js"
+            />
+          </div>
+
+          <div>
+            <h3 className="text-lg font-medium text-slate-900 dark:text-white mb-3 flex items-center gap-2">
+              <span className="w-6 h-6 rounded-full bg-coral-500 text-white text-sm flex items-center justify-center">3</span>
+              Configuration options
+            </h3>
+            <CodeBlock
+              code={`BugRadar.init({
+  // Required
+  apiKey: 'br_live_xxx',
+  apiUrl: 'https://your-dashboard.vercel.app/api/v1',
+
+  // Optional
+  enableScreenshot: true,      // Capture screenshots
+  enableConsoleLogs: true,     // Capture console logs
+  enableNetworkLogs: true,     // Capture network requests
+  enableAutoCapture: true,     // Auto-capture errors
+  position: 'bottom-right',    // Widget position
+  theme: 'auto',               // light, dark, or auto
+  showButton: true,            // Show floating button
+  userIdentifier: 'user@example.com',
+  metadata: { version: '1.0.0' }
+})`}
+              language="javascript"
+              filename="app.js"
+            />
+          </div>
+
+          <div className="flex items-start gap-3 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl">
+            <Terminal className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="font-medium text-blue-900 dark:text-blue-100 mb-1">API Methods</p>
+              <ul className="text-sm text-blue-700 dark:text-blue-300 space-y-1">
+                <li><code className="bg-blue-100 dark:bg-blue-800 px-1 rounded">BugRadar.open()</code> - Open bug reporter widget</li>
+                <li><code className="bg-blue-100 dark:bg-blue-800 px-1 rounded">BugRadar.captureError(error)</code> - Capture error manually</li>
+                <li><code className="bg-blue-100 dark:bg-blue-800 px-1 rounded">BugRadar.setUser(&apos;email@example.com&apos;)</code> - Set user identifier</li>
+                <li><code className="bg-blue-100 dark:bg-blue-800 px-1 rounded">BugRadar.setMetadata({'{...}'})</code> - Add custom metadata</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Features */}
       <div className="not-prose mb-12">
         <h2 className="text-2xl font-semibold text-slate-900 dark:text-white mb-6">
