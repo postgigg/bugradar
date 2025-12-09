@@ -5,13 +5,10 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
   Bug, Home, FolderKanban, Users, Settings,
-  CreditCard, Key, ChevronLeft, ChevronRight,
-  Menu, X, Bell, Search, LogOut, Moon, Sun
+  Key, ChevronLeft, ChevronRight,
+  Menu, X, Bell, Search, Moon, Sun
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { Button } from '@/components/ui/button'
-import { createClient } from '@/lib/supabase/client'
-import { useRouter } from 'next/navigation'
 
 interface DashboardShellProps {
   children: React.ReactNode
@@ -28,13 +25,11 @@ const navigation = [
 
 const secondaryNav = [
   { name: 'Settings', href: '/dashboard/settings', icon: Settings },
-  { name: 'Billing', href: '/dashboard/billing', icon: CreditCard },
   { name: 'API Keys', href: '/dashboard/api-keys', icon: Key },
 ]
 
 export function DashboardShell({ children, user, organization }: DashboardShellProps) {
   const pathname = usePathname()
-  const router = useRouter()
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [darkMode, setDarkMode] = useState(false)
@@ -50,13 +45,6 @@ export function DashboardShell({ children, user, organization }: DashboardShellP
       document.documentElement.classList.add('dark')
     }
   }, [])
-
-  const supabase = createClient()
-
-  const handleSignOut = async () => {
-    await supabase.auth.signOut()
-    router.push('/login')
-  }
 
   const toggleDarkMode = () => {
     setDarkMode(!darkMode)
@@ -231,11 +219,6 @@ export function DashboardShell({ children, user, organization }: DashboardShellP
                 <Bell className="w-5 h-5 text-slate-600 dark:text-slate-400" />
                 <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-coral-500 rounded-full" />
               </button>
-
-              <Button variant="ghost" size="sm" onClick={handleSignOut}>
-                <LogOut className="w-4 h-4 mr-2" />
-                <span className="hidden sm:inline">Sign out</span>
-              </Button>
             </div>
           </div>
         </header>

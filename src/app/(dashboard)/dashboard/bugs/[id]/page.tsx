@@ -50,35 +50,26 @@ export default async function BugPage({ params }: BugPageProps) {
     notFound()
   }
 
-  // Get team members for assignment dropdown
-  const { data: { user } } = await supabase.auth.getUser()
-  const { data: memberships } = await supabase
-    .from('organization_members')
-    .select('organization_id')
-    .eq('user_id', user?.id)
-    .order('joined_at', { ascending: false })
+  // For self-hosted: get first organization (no auth required)
+  const { data: org } = await supabase
+    .from('organizations')
+    .select('id')
     .limit(1)
-
-  const membership = memberships?.[0]
-
-  const { data: teamMembers } = await supabase
-    .from('organization_members')
-    .select('user_id, users(id, full_name, email)')
-    .eq('organization_id', membership?.organization_id || '')
-
-  // Get subscription for AI credits
-  const { data: subscription } = await supabase
-    .from('subscriptions')
-    .select('ai_credits_used, ai_credits_limit, plan_tier')
-    .eq('organization_id', membership?.organization_id || '')
     .single()
+
+  // Self-hosted: unlimited everything
+  const unlimitedSubscription = {
+    ai_credits_used: 0,
+    ai_credits_limit: 999999,
+    plan_tier: 'enterprise' as const,
+  }
 
   return (
     <BugDetail
       bug={bug}
-      teamMembers={teamMembers || []}
-      subscription={subscription || { ai_credits_used: 0, ai_credits_limit: 10, plan_tier: 'free' }}
-      organizationId={membership?.organization_id}
+      teamMembers={[]}
+      subscription={unlimitedSubscription}
+      organizationId={org?.id}
     />
   )
 }

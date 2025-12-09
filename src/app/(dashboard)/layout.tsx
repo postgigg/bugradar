@@ -1,31 +1,36 @@
-import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { DashboardShell } from '@/components/dashboard/dashboard-shell'
+import { redirect } from 'next/navigation'
 
 export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  // For self-hosted: check if setup is complete (has organization)
   const supabase = await createClient()
 
-  const { data: { user } } = await supabase.auth.getUser()
-
-  if (!user) {
-    redirect('/login')
-  }
-
-  // Get user profile with organization
-  const { data: profile } = await supabase
-    .from('users')
-    .select('*, organization_members(organization_id, role, organizations(id, name, slug))')
-    .eq('id', user.id)
+  // Try to get first organization (self-hosted has one org)
+  const { data: organization } = await supabase
+    .from('organizations')
+    .select('*')
+    .limit(1)
     .single()
 
-  const organization = profile?.organization_members?.[0]?.organizations
+  // If no organization exists, redirect to setup
+  if (!organization) {
+    redirect('/setup')
+  }
+
+  // Create a mock user for self-hosted (single user mode)
+  const selfHostedUser = {
+    id: 'self-hosted-admin',
+    email: 'admin@localhost',
+    full_name: 'Admin',
+  }
 
   return (
-    <DashboardShell user={profile} organization={organization}>
+    <DashboardShell user={selfHostedUser} organization={organization}>
       {children}
     </DashboardShell>
   )

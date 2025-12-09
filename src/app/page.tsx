@@ -26,7 +26,7 @@ export default function LandingPage() {
                 <Github className="w-4 h-4" />
                 <span>Star on GitHub</span>
               </Link>
-              <Link href="/onboarding">
+              <Link href="/setup">
                 <Button size="sm" className="rounded-full px-5">Get Started</Button>
               </Link>
             </div>
@@ -70,7 +70,7 @@ export default function LandingPage() {
 
               {/* CTAs */}
               <div className="mt-10 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
-                <Link href="/onboarding">
+                <Link href="/setup">
                   <Button size="lg" className="group rounded-full text-base px-8 h-12 shadow-lg shadow-coral-500/25">
                     Start Free
                     <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
@@ -363,7 +363,7 @@ export default function LandingPage() {
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link href="/onboarding">
+            <Link href="/setup">
               <Button size="lg" className="rounded-full text-base px-10 h-12 bg-white text-slate-900 hover:bg-slate-100">
                 Start Free
                 <ArrowRight className="w-4 h-4 ml-2" />
