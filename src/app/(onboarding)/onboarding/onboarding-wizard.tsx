@@ -12,7 +12,7 @@ import { StepTest } from './steps/step-test'
 const steps = [
   { title: 'Experience', description: 'Your skill level' },
   { title: 'Organization', description: 'Create your workspace' },
-  { title: 'Plan', description: 'Choose your plan' },
+  { title: 'Services', description: 'Connect your accounts' },
   { title: 'Project', description: 'Set up your first project' },
   { title: 'Install', description: 'Get your API key' },
   { title: 'Test', description: 'Verify installation' },
