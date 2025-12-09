@@ -14,8 +14,8 @@ export function getResend(): Resend {
   return _resend
 }
 
-// Email configuration
+// Email configuration - uses env vars for self-hosted
 export const emailConfig = {
-  from: 'BugRadar <notifications@bugradar.io>',
-  replyTo: 'support@bugradar.io',
+  from: process.env.EMAIL_FROM || 'BugRadar <noreply@yourdomain.com>',
+  replyTo: process.env.EMAIL_REPLY_TO || 'support@yourdomain.com',
 }

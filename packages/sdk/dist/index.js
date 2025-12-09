@@ -3401,7 +3401,7 @@ var init_client = __esm({
     init_widget();
     init_bug_overlay();
     init_screenshot();
-    DEFAULT_API_URL = "https://bugradar.io/api/v1";
+    DEFAULT_API_URL = "";
     BugRadarClient = class {
       constructor() {
         this.config = null;
@@ -3421,9 +3421,14 @@ var init_client = __esm({
           return;
         }
         if (typeof apiKeyOrConfig === "string") {
-          this.config = { apiKey: apiKeyOrConfig };
+          console.error('[BugRadar] For self-hosted, you must pass a config object with apiUrl. Example: BugRadar.init({ apiKey: "...", apiUrl: "https://your-dashboard.com/api/v1" })');
+          return;
         } else {
           this.config = apiKeyOrConfig;
+        }
+        if (!this.config.apiUrl) {
+          console.error('[BugRadar] apiUrl is required for self-hosted. Example: BugRadar.init({ apiKey: "...", apiUrl: "https://your-dashboard.com/api/v1" })');
+          return;
         }
         this.config = {
           apiUrl: DEFAULT_API_URL,

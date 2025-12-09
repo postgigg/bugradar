@@ -204,7 +204,7 @@ export function ScreenshotBadgeOverlay({
 
   // Build the fix prompt for Claude Code
   const buildFixPrompt = () => {
-    const webhookUrl = 'https://bugradar.io/api/webhooks/claude-code'
+    const webhookUrl = typeof window !== 'undefined' ? `${window.location.origin}/api/webhooks/claude-code` : '/api/webhooks/claude-code'
 
     // Build elements section
     let elementsSection = ''

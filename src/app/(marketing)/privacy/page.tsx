@@ -56,10 +56,10 @@ export default function PrivacyPage() {
           </ul>
 
           <h2>6. Your Rights</h2>
-          <p>You have the right to access, correct, or delete your personal data. Contact us at privacy@bugradar.io.</p>
+          <p>You have the right to access, correct, or delete your personal data. Contact your instance administrator.</p>
 
           <h2>7. Contact Us</h2>
-          <p>For privacy-related questions, email us at privacy@bugradar.io.</p>
+          <p>For privacy-related questions, contact your instance administrator.</p>
         </div>
       </div>
     </div>

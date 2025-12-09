@@ -225,7 +225,7 @@ function buildFixPrompt(data: {
   consoleErrors?: string[]
   organizationId?: string
 }): string {
-  const webhookUrl = 'https://bugradar.io/api/webhooks/claude-code'
+  const webhookUrl = process.env.NEXT_PUBLIC_APP_URL ? `${process.env.NEXT_PUBLIC_APP_URL}/api/webhooks/claude-code` : '/api/webhooks/claude-code'
 
   // Build elements section
   let elementsSection = ''

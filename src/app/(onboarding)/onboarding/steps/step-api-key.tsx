@@ -15,7 +15,7 @@ const installCommands: Record<PackageManager, string> = {
   npm: 'npm install bugradar',
   yarn: 'yarn add bugradar',
   pnpm: 'pnpm add bugradar',
-  cdn: '<script src="https://cdn.bugradar.io/v1/bugradar.min.js"></script>',
+  cdn: '<!-- CDN not available for self-hosted. Use npm install instead -->',
 }
 
 export function StepApiKey() {
@@ -37,10 +37,15 @@ export function StepApiKey() {
 
 BugRadar.init('${devKey}');`
 
-  const cdnInitCode = `<script src="https://cdn.bugradar.io/v1/bugradar.min.js"></script>
-<script>
-  BugRadar.init('${devKey}');
-</script>`
+  // For self-hosted, always use npm package
+  const cdnInitCode = `// CDN not available for self-hosted. Use npm:
+// npm install bugradar
+
+import { BugRadar } from 'bugradar';
+BugRadar.init({
+  apiKey: '${devKey}',
+  apiUrl: window.location.origin + '/api/v1'
+});`
 
   return (
     <div className="p-6 space-y-6">

@@ -4,19 +4,12 @@ import { Button } from '@/components/ui/button'
 import { createClient } from '@/lib/supabase/client'
 import { useState } from 'react'
 
-// Always use the canonical domain for OAuth callbacks to avoid cookie issues
+// Use the current origin for OAuth callbacks (self-hosted)
 const getRedirectUrl = () => {
-  // In production, always use bugradar.io regardless of current URL
-  // This ensures cookies are set on the correct domain
   if (typeof window !== 'undefined') {
-    const hostname = window.location.hostname
-    // If on any netlify URL or production domain, use bugradar.io
-    if (hostname.includes('netlify.app') || hostname === 'bugradar.io') {
-      return 'https://bugradar.io/auth/callback'
-    }
+    return `${window.location.origin}/auth/callback`
   }
-  // For local development
-  return `${typeof window !== 'undefined' ? window.location.origin : ''}/auth/callback`
+  return '/auth/callback'
 }
 
 export function OAuthButtons() {

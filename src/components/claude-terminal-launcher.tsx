@@ -66,10 +66,10 @@ export function ClaudeTerminalLauncher({
 
   const creditsRemaining = aiCreditsLimit - aiCreditsUsed
 
-  // Set webhook URL on client side only
+  // Set webhook URL on client side only (uses current origin for self-hosted)
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      setWebhookUrl('https://bugradar.io/api/webhooks/claude-code')
+      setWebhookUrl(`${window.location.origin}/api/webhooks/claude-code`)
     }
   }, [])
 

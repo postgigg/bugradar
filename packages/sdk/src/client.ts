@@ -6,7 +6,8 @@ import { BugReporterWidget } from './widget/widget';
 import { BugOverlay } from './widget/bug-overlay';
 import { captureScreenshot } from './utils/screenshot';
 
-const DEFAULT_API_URL = 'https://bugradar.io/api/v1';
+// Default API URL - users MUST override this with their own dashboard URL for self-hosted
+const DEFAULT_API_URL = '';
 
 class BugRadarClient {
   private config: BugRadarConfig | null = null;
@@ -32,9 +33,16 @@ class BugRadarClient {
 
     // Handle string API key or full config
     if (typeof apiKeyOrConfig === 'string') {
-      this.config = { apiKey: apiKeyOrConfig };
+      console.error('[BugRadar] For self-hosted, you must pass a config object with apiUrl. Example: BugRadar.init({ apiKey: "...", apiUrl: "https://your-dashboard.com/api/v1" })');
+      return;
     } else {
       this.config = apiKeyOrConfig;
+    }
+
+    // Validate apiUrl for self-hosted
+    if (!this.config.apiUrl) {
+      console.error('[BugRadar] apiUrl is required for self-hosted. Example: BugRadar.init({ apiKey: "...", apiUrl: "https://your-dashboard.com/api/v1" })');
+      return;
     }
 
     // Set defaults

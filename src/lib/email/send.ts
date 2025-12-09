@@ -15,7 +15,7 @@ interface SendBugCreatedEmailParams {
 }
 
 export async function sendBugCreatedEmail(params: SendBugCreatedEmailParams) {
-  const dashboardUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://bugradar.io'
+  const dashboardUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
 
   const { subject, html } = bugCreatedEmail({
     ...params,

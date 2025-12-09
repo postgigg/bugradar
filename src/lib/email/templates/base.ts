@@ -127,7 +127,7 @@ export function baseEmailTemplate({ previewText, children }: BaseEmailProps): st
               <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
                 <tr>
                   <td align="left">
-                    <img src="https://bugradar.io/logo.png" alt="BugRadar" width="140" style="display: block;" />
+                    <img src="${process.env.NEXT_PUBLIC_APP_URL || ''}/logo.svg" alt="BugRadar" width="140" style="display: block;" />
                   </td>
                 </tr>
               </table>

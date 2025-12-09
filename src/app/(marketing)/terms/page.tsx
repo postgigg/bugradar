@@ -58,7 +58,7 @@ export default function TermsPage() {
           <p>We may update these terms at any time. Continued use constitutes acceptance of changes.</p>
 
           <h2>10. Contact</h2>
-          <p>Questions about these terms? Contact us at legal@bugradar.io.</p>
+          <p>Questions about these terms? Contact your instance administrator.</p>
         </div>
       </div>
     </div>
